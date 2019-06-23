@@ -1,0 +1,28 @@
+{
+  "name": "homebridge-pihole",
+  "version": "0.0.1",
+  "description": "Pihole Switch for Homebridge: https://github.com/nfarina/homebridge",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "echo \"Error: configure and run homebridge to start\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/arendruni/homebridge-pihole"
+  },
+  "keywords": [
+    "homebridge-plugin"
+  ],
+  "author": "arendruni",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/arendruni/homebridge-pihole/issues"
+  },
+  "homepage": "https://github.com/arendruni/homebridge-pihole#readme",
+  "dependencies": {},
+  "engines": {
+    "node": ">=0.12.0",
+    "homebridge": ">=0.2.0"
+  }
+}
