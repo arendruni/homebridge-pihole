@@ -1,6 +1,8 @@
 var Service, Characteristic;
 var http = require('http');
 
+const baseURL = '/admin/api.php';
+
 module.exports = function (hb) {
 	Service = hb.hap.Service;
 	Characteristic = hb.hap.Characteristic;
@@ -10,11 +12,15 @@ module.exports = function (hb) {
 
 function pihole(log, config) {
 	this.log = log;
+	global.log = log;
 
 	this.manufacturer = config["manufacturer"] || "My manufacturer";
 	this.model = config["model"] || "My model";
 	this.serial = config["serial-number"] || "123-456-789";
 	this.name = config["name"] || "Pihole";
+
+	this.auth = config["auth"];
+	this.host = config["host"] || "localhost";
 }
 
 pihole.prototype.getServices = function () {
@@ -36,19 +42,23 @@ pihole.prototype.getServices = function () {
 }
 
 pihole.prototype.getStatus = function (next) {
-	http.get({
-		host: '192.168.1.9',
-		path: '/admin/api.php?status'
-	}, (res) => {
-		next(null, res.status == 'enabled');
-	})
+	pihole.prototype._makeRequest('?status', next);
 }
 
 pihole.prototype.setStatus = function (newVal, next) {
+	pihole.prototype._makeRequest((newVal ? '?enable' : '?disable') + '&auth=' + this.auth, next);
+}
+
+pihole.prototype._responseHandler = function (res, next) {
+	let body = '';
+
+	res.on('data', (data) => { body += data; });
+	res.on('end', () => { global.log(body);  next(null, JSON.parse(body).status == 'enabled'); });
+}
+
+pihole.prototype._makeRequest = function (path, next) {
 	http.get({
-		host: '192.168.1.9',
-		path: '/admin/api.php?' + (newVal ? 'enable' : 'disable') + '&auth=16406a5e80c9aa95474a080731d89fe9b9022dcbd109db15e7892c9568e4841f'
-	}, (res) => {
-		next(null, res.status == 'enabled');
-	})
+		host: this.host,
+		path: baseURL + path
+	}, (res) => pihole.prototype._responseHandler(res, next));
 }
