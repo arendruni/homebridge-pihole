@@ -1,0 +1,17 @@
+{
+	"bridge": {
+		"name": "HomebridgePI",
+		"username": "CD:22:3D:E3:CE:30",
+		"port": 51826,
+		"pin": "031-45-156"
+	},
+	"description": "This is an example configuration file",
+	"platforms": [],
+	"accessories": [
+		{
+			"accessory": "Pihole",
+			"name": "Homelab pi-hole",
+			"auth": "3c469e9d6c5875d37a43f353d4f88e61fcf812c66eee3457465a40b0da4153e0"
+		}
+	]
+}
