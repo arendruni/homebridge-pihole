@@ -18,9 +18,10 @@ See the Pi-hole [installation section](https://github.com/pi-hole/pi-hole#one-st
 
 ## Configuration
 
-There are only two required options:
- * ```name``` Accessory name.
+There are only three required options:
+ * ```name``` Accessory name, defautl is _Pihole_.
  * ```auth``` Pi-hole auth token.
+ * ```host``` Pi-hole host, default is `localhost`.
 
 See the [sample-config.json](sample-config.json) file to see an example of working accessory config.
 
