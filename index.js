@@ -42,11 +42,11 @@ pihole.prototype.getServices = function () {
 }
 
 pihole.prototype.getStatus = function (next) {
-	pihole.prototype._makeRequest('?status', next);
+	this._makeRequest('?status', next);
 }
 
 pihole.prototype.setStatus = function (newVal, next) {
-	pihole.prototype._makeRequest((newVal ? '?enable' : '?disable') + '&auth=' + this.auth, next);
+	this._makeRequest((newVal ? '?enable' : '?disable') + '&auth=' + this.auth, next);
 }
 
 pihole.prototype._responseHandler = function (res, next) {
@@ -60,5 +60,5 @@ pihole.prototype._makeRequest = function (path, next) {
 	http.get({
 		host: this.host,
 		path: baseURL + path
-	}, (res) => pihole.prototype._responseHandler(res, next));
+	}, (res) => this._responseHandler(res, next));
 }
