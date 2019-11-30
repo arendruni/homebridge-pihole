@@ -18,12 +18,13 @@ See the Pi-hole [installation section](https://github.com/pi-hole/pi-hole#one-st
 
 ## Configuration
 
-There are only three required options:
- * ```name``` Accessory name, defautl is _Pihole_.
- * ```auth``` Pi-hole auth token.
+There are four options:
+ * ```name``` Required. Accessory name, default is _Pihole_.
+ * ```auth``` Required. Pi-hole auth token.
  * ```host``` Pi-hole host, default is `localhost`.
+ * ```time``` How long Pi-hole will be disabled, in seconds, default is 0 that means permanently disabled.
 
-See the [sample-config.json](sample-config.json) file to see an example of working accessory config.
+See the [sample-config.json](sample-config.json) file to see an example of how to configure the accessory. In the example the configured accessory will disable pi-hole for a time interval of two minutes (120 seconds).
 
 ## How to get a Pi-hole authentication token
 1.	Login into your Pi-hole Admin Console.

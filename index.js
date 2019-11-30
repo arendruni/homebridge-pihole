@@ -21,6 +21,7 @@ function pihole(log, config) {
 
 	this.auth = config["auth"];
 	this.host = config["host"] || "localhost";
+	this.time = config["time"] || 0;
 }
 
 pihole.prototype.getServices = function () {
@@ -46,7 +47,7 @@ pihole.prototype.getStatus = function (next) {
 }
 
 pihole.prototype.setStatus = function (newVal, next) {
-	this._makeRequest((newVal ? '?enable' : '?disable') + '&auth=' + this.auth, next);
+	this._makeRequest((newVal ? '?enable' : ('?disable=' + this.time)) + '&auth=' + this.auth, next);
 }
 
 pihole.prototype._responseHandler = function (res, next) {
