@@ -22,6 +22,7 @@ function pihole(log, config) {
 	this.auth = config["auth"];
 	this.host = config["host"] || "localhost";
 	this.time = config["time"] || 0;
+	this.port = config["port"] || 80;
 }
 
 pihole.prototype.getServices = function () {
@@ -60,6 +61,7 @@ pihole.prototype._responseHandler = function (res, next) {
 pihole.prototype._makeRequest = function (path, next) {
 	http.get({
 		host: this.host,
+		port: this.port,
 		path: baseURL + path
 	}, (res) => this._responseHandler(res, next));
 }
