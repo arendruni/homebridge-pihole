@@ -7,32 +7,36 @@
 [Pi-hole](https://github.com/pi-hole/pi-hole) plugin for Homebridge
 
 ## Requirements
--	[Homebridge](https://github.com/nfarina/homebridge) - _HomeKit support for the impatient_
--	[Pi-hole](https://github.com/pi-hole/pi-hole) - _A black hole for Internet advertisements_
+
+-   [Homebridge](https://github.com/nfarina/homebridge) - *HomeKit support for the impatient*
+-   [Pi-hole](https://github.com/pi-hole/pi-hole) - *A black hole for Internet advertisements*
 
 ## Installation
-1.	Install this plugin `npm install -g homebridge-pihole`
-2.	Update your configuration file. See sample-config.json in this repository for a sample.
+
+1.  Install this plugin `npm install -g homebridge-pihole`
+2.  Update your configuration file. See sample-config.json in this repository for a sample.
 
 See the Pi-hole [installation section](https://github.com/pi-hole/pi-hole#one-step-automated-install) for more details.
 
 ## Configuration
 
 There are four options:
- * ```name``` Required. Accessory name, default is _Pihole_.
- * ```auth``` Required. Pi-hole auth token.
- * ```host``` Pi-hole host, default is `localhost`.
- * ```port``` Pi-hole port, default is `80`.
- * ```time``` How long Pi-hole will be disabled, in seconds, default is 0 that means permanently disabled.
+
+-   `name` Required. Accessory name, default is *Pihole*.
+-   `auth` Required. Pi-hole auth token.
+-   `host` Pi-hole host, default is `localhost`.
+-   `port` Pi-hole port, default is `80`.
+-   `time` How long Pi-hole will be disabled, in seconds, default is 0 that means permanently disabled.
 
 See the [sample-config.json](sample-config.json) file to see an example of how to configure the accessory. In the example the configured accessory will disable pi-hole for a time interval of two minutes (120 seconds).
 
 ## How to get a Pi-hole authentication token
-1.	Login into your Pi-hole Admin Console.
-2.	Navigate to the _Settings_ page and then to the _API / Web interface_ tab.
-3.	At the bottom of the page click on the _Show API Token_ button, a popup window will ask for confirmation, go ahead and click on _Yes, show API token_.
-4.	A new window will open showing a QR code, copy the _Raw API Token_ below the QR code.
-5.	Paste your API token in the homebridge configuration file.
+
+1.  Login into your Pi-hole Admin Console.
+2.  Navigate to the *Settings* page and then to the *API / Web interface* tab.
+3.  At the bottom of the page click on the *Show API Token* button, a popup window will ask for confirmation, go ahead and click on *Yes, show API token*.
+4.  A new window will open showing a QR code, copy the *Raw API Token* below the QR code.
+5.  Paste your API token in the homebridge configuration file.
 
 ## Licence
 

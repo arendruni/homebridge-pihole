@@ -1,14 +1,7 @@
 var Service, Characteristic;
-var http = require('http');
+var http = require("http");
 
-const baseURL = '/admin/api.php';
-
-module.exports = function (hb) {
-	Service = hb.hap.Service;
-	Characteristic = hb.hap.Characteristic;
-
-	hb.registerAccessory("homebridge-pihole", "Pihole", pihole);
-}
+const baseURL = "/admin/api.php";
 
 function pihole(log, config) {
 	this.log = log;
@@ -34,29 +27,29 @@ pihole.prototype.getServices = function () {
 	var switchService = new Service.Switch(this.name);
 	switchService
 		.getCharacteristic(Characteristic.On)
-		.on('get', this.getStatus.bind(this))
-		.on('set', this.setStatus.bind(this));
+		.on("get", this.getStatus.bind(this))
+		.on("set", this.setStatus.bind(this));
 
 	this.informationService = infoService;
 	this.switchService = switchService;
 
 	return [this.informationService, this.switchService];
-}
+};
 
 pihole.prototype.getStatus = function (next) {
-	this._makeRequest('?status', next);
-}
+	this._makeRequest("?status", next);
+};
 
 pihole.prototype.setStatus = function (newVal, next) {
-	this._makeRequest((newVal ? '?enable' : ('?disable=' + this.time)) + '&auth=' + this.auth, next);
-}
+	this._makeRequest((newVal ? "?enable" : ("?disable=" + this.time)) + "&auth=" + this.auth, next);
+};
 
 pihole.prototype._responseHandler = function (res, next) {
-	let body = '';
+	let body = "";
 
-	res.on('data', (data) => { body += data; });
-	res.on('end', () => { global.log(body);  next(null, JSON.parse(body).status == 'enabled'); });
-}
+	res.on("data", (data) => { body += data; });
+	res.on("end", () => { global.log(body);  next(null, JSON.parse(body).status === "enabled"); });
+};
 
 pihole.prototype._makeRequest = function (path, next) {
 	http.get({
@@ -64,4 +57,11 @@ pihole.prototype._makeRequest = function (path, next) {
 		port: this.port,
 		path: baseURL + path
 	}, (res) => this._responseHandler(res, next));
-}
+};
+
+module.exports = function (hb) {
+	Service = hb.hap.Service;
+	Characteristic = hb.hap.Characteristic;
+
+	hb.registerAccessory("homebridge-pihole", "Pihole", pihole);
+};
