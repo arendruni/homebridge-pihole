@@ -4,8 +4,7 @@
   "description": "Pihole Switch for Homebridge: https://github.com/nfarina/homebridge",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "echo \"Error: configure and run homebridge to start\" && exit 1"
+    "test": "node index.js && echo \"No syntax errors! (node $(node -v))\""
   },
   "repository": {
     "type": "git",
@@ -22,7 +21,7 @@
   "homepage": "https://github.com/arendruni/homebridge-pihole#readme",
   "dependencies": {},
   "engines": {
-    "node": ">=0.12.0",
+    "node": ">=6.0.0",
     "homebridge": ">=0.2.0"
   }
 }
