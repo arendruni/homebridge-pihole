@@ -53,17 +53,18 @@ pihole.prototype._responseHandler = function (res, next) {
 		if (this.logLevel === 1) { this.log(body); }
 		next(null, JSON.parse(body).status === "enabled");
 	});
-	res.on("error", (err) => {
-		if (this.logLevel === 1) { this.log(err); }
-	})
 };
 
 pihole.prototype._makeRequest = function (path, next) {
-	http.get({
+	let req = http.get({
 		host: this.host,
 		port: this.port,
 		path: baseURL + path
 	}, (res) => this._responseHandler(res, next));
+
+	req.on("error", (err) => {
+		this.log(err);
+	});
 };
 
 module.exports = function (hb) {
