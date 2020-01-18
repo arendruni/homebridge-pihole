@@ -1,6 +1,7 @@
 [![npm](https://img.shields.io/npm/v/homebridge-pihole.svg)](https://www.npmjs.com/package/homebridge-pihole)
 [![npm](https://img.shields.io/npm/dt/homebridge-pihole.svg)](https://www.npmjs.com/package/homebridge-pihole)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/8bf5a87dc8a84df6a15deb699d43ee2b)](https://www.codacy.com/manual/arendruni/homebridge-pihole?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=arendruni/homebridge-pihole&amp;utm_campaign=Badge_Grade)
+[![Build Status](https://travis-ci.org/arendruni/homebridge-pihole.svg?branch=master)](https://travis-ci.org/arendruni/homebridge-pihole)
 [![MIT license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 # Homebridge Pi-hole
