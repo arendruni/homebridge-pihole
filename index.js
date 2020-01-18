@@ -5,7 +5,6 @@ const baseURL = "/admin/api.php";
 
 function pihole(log, config) {
 	this.log = log;
-	global.log = log;
 
 	this.manufacturer = config["manufacturer"] || "My manufacturer";
 	this.model = config["model"] || "My model";
@@ -48,7 +47,7 @@ pihole.prototype._responseHandler = function (res, next) {
 	let body = "";
 
 	res.on("data", (data) => { body += data; });
-	res.on("end", () => { global.log(body);  next(null, JSON.parse(body).status === "enabled"); });
+	res.on("end", () => { this.log(body);  next(null, JSON.parse(body).status === "enabled"); });
 };
 
 pihole.prototype._makeRequest = function (path, next) {
