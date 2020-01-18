@@ -15,6 +15,8 @@ function pihole(log, config) {
 	this.host = config["host"] || "localhost";
 	this.time = config["time"] || 0;
 	this.port = config["port"] || 80;
+
+	this.logLevel = config["logLevel"] || 0;
 }
 
 pihole.prototype.getServices = function () {
@@ -47,7 +49,13 @@ pihole.prototype._responseHandler = function (res, next) {
 	let body = "";
 
 	res.on("data", (data) => { body += data; });
-	res.on("end", () => { this.log(body);  next(null, JSON.parse(body).status === "enabled"); });
+	res.on("end", () => {
+		if (this.logLevel === 1) { this.log(body); }
+		next(null, JSON.parse(body).status === "enabled");
+	});
+	res.on("error", (err) => {
+		if (this.logLevel === 1) { this.log(err); }
+	})
 };
 
 pihole.prototype._makeRequest = function (path, next) {
