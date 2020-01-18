@@ -28,6 +28,7 @@ There are four options:
 -   `host` Pi-hole host, default is `localhost`.
 -   `port` Pi-hole port, default is `80`.
 -   `time` How long Pi-hole will be disabled, in seconds, default is 0 that means permanently disabled.
+-   `logLevel` Logging level, three different levels: 0: logging disabled, 1: logs only HTTP errors, 2: logs each HTTP response. Default is set to 1.
 
 See the [sample-config.json](sample-config.json) file to see an example of how to configure the accessory. In the example the configured accessory will disable pi-hole for a time interval of two minutes (120 seconds).
 
