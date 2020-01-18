@@ -16,7 +16,12 @@ function pihole(log, config) {
 	this.time = config["time"] || 0;
 	this.port = config["port"] || 80;
 
-	this.logLevel = config["logLevel"] || 0;
+	// logLevel 0: disabled, 1: error, 2: info
+	if (typeof config["logLevel"] === "undefined") {
+		this.logLevel = 1;
+	} else {
+		this.logLevel = config["logLevel"];
+	}
 }
 
 pihole.prototype.getServices = function () {
@@ -50,7 +55,7 @@ pihole.prototype._responseHandler = function (res, next) {
 
 	res.on("data", (data) => { body += data; });
 	res.on("end", () => {
-		if (this.logLevel === 1) { this.log(body); }
+		if (this.logLevel >= 2) { this.log(body); }
 		next(null, JSON.parse(body).status === "enabled");
 	});
 };
@@ -63,7 +68,7 @@ pihole.prototype._makeRequest = function (path, next) {
 	}, (res) => this._responseHandler(res, next));
 
 	req.on("error", (err) => {
-		this.log(err);
+		if (this.logLevel >= 1) { this.log(err); }
 	});
 };
 
