@@ -4,6 +4,10 @@ node_js:
 - 7
 - 8
 - 10
+before_install:
+  - npm install -g --unsafe-perm homebridge
+script:
+  - DEBUG=* timeout --preserve-status --kill-after 30s --signal SIGINT 20s homebridge --debug --no-qrcode --user-storage-path ./test-configuration --plugin-path ./ ; test $? == 130
 jobs:
   include:
   - stage: npm release

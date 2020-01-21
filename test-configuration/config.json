@@ -1,0 +1,18 @@
+{
+	"bridge": {
+		"name": "HomebridgePI-test",
+		"username": "CD:22:3D:E3:CE:30",
+		"port": 51826,
+		"pin": "031-45-156"
+	},
+	"description": "This is a test configuration file",
+	"platforms": [],
+	"accessories": [
+		{
+			"accessory": "Pihole",
+			"name": "pi-hole - test",
+			"host": "localhost",
+			"time": 120
+		}
+	]
+}
