@@ -56,7 +56,19 @@ pihole.prototype._responseHandler = function (res, next) {
 	res.on("data", (data) => { body += data; });
 	res.on("end", () => {
 		if (this.logLevel >= 2) { this.log(body); }
-		next(null, JSON.parse(body).status === "enabled");
+
+		try {
+			let jsonBody = JSON.parse(body);
+
+			if (jsonBody.status) {
+				next(null, jsonBody.status === "enabled");
+			} else {
+				next({});
+			}
+		} catch (e) {
+			if (this.logLevel >= 1) { this.log(e); }
+			next(e);
+		}
 	});
 };
 
