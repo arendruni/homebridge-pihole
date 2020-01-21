@@ -25,7 +25,7 @@ See the Pi-hole [installation section](https://github.com/pi-hole/pi-hole#one-st
 There are four options:
 
 -   `name` Required. Accessory name, default is *Pihole*.
--   `auth` Required. Pi-hole auth token.
+-   `auth` Pi-hole auth token.
 -   `host` Pi-hole host, default is `localhost`.
 -   `port` Pi-hole port, default is `80`.
 -   `time` How long Pi-hole will be disabled, in seconds, default is 0 that means permanently disabled.

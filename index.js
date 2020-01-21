@@ -11,7 +11,7 @@ function pihole(log, config) {
 	this.serial = config["serial-number"] || "123-456-789";
 	this.name = config["name"] || "Pihole";
 
-	this.auth = config["auth"];
+	this.auth = config["auth"] || "";
 	this.host = config["host"] || "localhost";
 	this.time = config["time"] || 0;
 	this.port = config["port"] || 80;
