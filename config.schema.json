@@ -1,8 +1,6 @@
 {
     "pluginAlias": "Pihole",
     "pluginType": "accessory",
-    "headerDisplay": "This accessory will play/cast audio and/or video to your Chromecast on demand. It can be used for automation. The list of media (audio/video) to be played must be stored on a file. The plugin will pick a random media from the file every time you turn on the switch. If you want to apply always the same, create a json file with only one media.",
-    "footerDisplay": "For help with format of each media object: [Media File](https://github.com/paolotremadio/homebridge-automation-chromecast-play#media-file).",
     "schema": {
         "type": "object",
         "properties": {
