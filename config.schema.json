@@ -14,7 +14,6 @@
             "auth": {
                 "title": "Auth Token",
                 "type": "string",
-                "placeholder": "3c469e9d6c5875d37a43f353d4f88e61fcf812c66eee3457465a40b0da4153e0",
                 "required": false,
                 "description": "Pi-hole auth token."
             },
@@ -34,7 +33,7 @@
             },
             "time": {
                 "title": "Time",
-                "type": "string",
+                "type": "integer",
                 "placeholder": "0",
                 "required": false,
                 "description": "How long Pi-hole will be disabled, in seconds, default is 0 that means permanently disabled."
