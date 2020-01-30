@@ -11,13 +11,6 @@
                 "default": "Pihole",
                 "description": "A unique name for the accessory. It will be used as the accessory name in HomeKit."
             },
-            "accessory": {
-                "title": "Accessoy",
-                "type": "string",
-                "default": "Pihole",
-                "required": true,
-                "description": "This must be Pihole."
-            },
             "auth": {
                 "title": "Auth Token",
                 "type": "string",
