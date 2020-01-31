@@ -45,6 +45,27 @@
                 "title": "Loging level",
                 "type": "integer",
                 "placeholder": "1",
+                "default": 1,
+                "oneOf": [
+                    {
+                        "title": "Off",
+                        "enum": [
+                            0
+                        ]
+                    },
+                    {
+                        "title": "Error",
+                        "enum": [
+                            1
+                        ]
+                    },
+                    {
+                        "title": "Info",
+                        "enum": [
+                            2
+                        ]
+                    }
+                ],
                 "required": false,
                 "description": "Three different levels: 0: logging disabled, 1: logs only HTTP errors (Default), 2: logs each HTTP response."
             }
