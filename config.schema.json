@@ -21,6 +21,7 @@
                 "title": "Host",
                 "type": "string",
                 "placeholder": "localhost",
+                "default": "localhost",
                 "required": false,
                 "description": "Pi-hole host, default is localhost."
             },
@@ -28,6 +29,7 @@
                 "title": "Port",
                 "type": "integer",
                 "placeholder": "80",
+                "default": 80,
                 "required": false,
                 "description": "Pi-hole port, default is 80."
             },
@@ -35,6 +37,7 @@
                 "title": "Time",
                 "type": "integer",
                 "placeholder": "0",
+                "default": 0,
                 "required": false,
                 "description": "How long Pi-hole will be disabled, in seconds, default is 0 that means permanently disabled."
             },
