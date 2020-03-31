@@ -13,9 +13,6 @@ jobs:
         node-version: ${{ matrix.node-version }}
     - run: npm install
     - run: npm test
-    - name: install homebridge
-      run: npm install -g --unsafe-perm homebridge
-      shell: bash
-    - name: test plugin configuration
-      run: DEBUG=* timeout --preserve-status --kill-after 30s --signal SIGINT 20s homebridge --debug --no-qrcode --user-storage-path ./test-configuration --plugin-path ./ ; test $? == 130
+    - name: test script homebridge
+      run: ./test-configuration/test.sh
       shell: bash
