@@ -1,16 +1,7 @@
 #!/bin/sh
 
-# install homebridge
+# install homebridge image
 npm install -g --unsafe-perm homebridge
 
-# install pihole
-curl -sSL https://install.pi-hole.net | bash
-
-# test configuration
-DEBUG=* timeout --preserve-status --kill-after 30s --signal SIGINT 20s homebridge --debug --no-qrcode --user-storage-path ./test-configuration --plugin-path ./
-
-if [ $? -eq 130 ]; then
-	exit 0;
-fi
-
-exit $?
+DEBUG=* timeout --preserve-status --kill-after 40s --signal SIGINT 30s homebridge --debug --no-qrcode --user-storage-path ./test-configuration --plugin-path ./ &
+sleep 10 && curl -s -X PUT http://localhost:51826/characteristics --header "Content-Type:Application/json" --header "authorization: 031-45-156" --data "{\"characteristics\":[{\"aid\":3,\"iid\":10,\"value\":false}]}"

@@ -12,7 +12,8 @@
 			"accessory": "Pihole",
 			"name": "pi-hole - test",
 			"host": "localhost",
-			"time": 120
+			"time": 120,
+			"logLevel": 2
 		}
 	]
 }
