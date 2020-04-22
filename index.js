@@ -6,10 +6,10 @@ const baseURL = "/admin/api.php";
 function pihole(log, config) {
 	this.log = log;
 
-	this.manufacturer = config["manufacturer"] || "My manufacturer";
-	this.model = config["model"] || "My model";
+	this.manufacturer = config["manufacturer"] || "Raspberry Pi";
+	this.model = config["model"] || "PiHole";
 	this.serial = config["serial-number"] || "123-456-789";
-	this.name = config["name"] || "Pihole";
+	this.name = config["name"] || "PiHole";
 
 	this.auth = config["auth"] || "";
 	this.host = config["host"] || "localhost";
