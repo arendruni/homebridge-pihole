@@ -22,7 +22,7 @@ See the Pi-hole [installation section](https://github.com/pi-hole/pi-hole#one-st
 
 ## Configuration
 
-There are four options:
+There are the following options:
 
 - `name` Required. Accessory name, default is *Pihole*.
 - `auth` Pi-hole auth token.
@@ -30,6 +30,12 @@ There are four options:
 - `port` Pi-hole port, default is `80`.
 - `time` How long Pi-hole will be disabled, in seconds, default is 0 that means permanently disabled.
 - `logLevel` Logging level, three different levels: 0: logging disabled, 1: logs only HTTP errors, 2: logs each HTTP response. Default is set to 1.
+
+### Device Information
+- `manufactuer` Custom manufacturer.
+- `model` Custom model.
+- `serial-number` - should be a 9 digit number in the string format *123-456-789*
+- `name` - The model name.
 
 See the [sample-config.json](sample-config.json) file to see an example of how to configure the accessory. In the example the configured accessory will disable pi-hole for a time interval of two minutes (120 seconds).
 
