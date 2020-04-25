@@ -22,7 +22,7 @@ See the Pi-hole [installation section](https://github.com/pi-hole/pi-hole#one-st
 
 ## Configuration
 
-There are four options:
+There are the following options:
 
 - `name` Required. Accessory name, default is *Pihole*.
 - `auth` Pi-hole auth token.
@@ -30,6 +30,12 @@ There are four options:
 - `port` Pi-hole port, default is `80`.
 - `time` How long Pi-hole will be disabled, in seconds, default is 0 that means permanently disabled.
 - `logLevel` Logging level, three different levels: 0: logging disabled, 1: logs only HTTP errors, 2: logs each HTTP response. Default is set to 1.
+
+### Device Information
+- `manufacturer` Custom manufacturer.
+- `model` Custom model.
+- `serial-number` - should be a 9 digit number in the string format *123-456-789*
+- `name` - The model name.
 
 See the [sample-config.json](sample-config.json) file to see an example of how to configure the accessory. In the example the configured accessory will disable pi-hole for a time interval of two minutes (120 seconds).
 
@@ -40,27 +46,3 @@ See the [sample-config.json](sample-config.json) file to see an example of how t
 3. At the bottom of the page click on the *Show API Token* button, a popup window will ask for confirmation, go ahead and click on *Yes, show API token*.
 4. A new window will open showing a QR code, copy the *Raw API Token* below the QR code.
 5. Paste your API token in the homebridge configuration file.
-
-## Licence
-
-(The MIT License)
-
-Copyright (c) 2020
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
