@@ -24,7 +24,7 @@ See the Pi-hole [installation section](https://github.com/pi-hole/pi-hole#one-st
 
 There are the following options:
 
-- `accessory` Required. Accessory name, default is *Pihole*.
+- `name` Required. Accessory name, default is *Pihole*.
 
 ### Pi-hole Configuration
 
