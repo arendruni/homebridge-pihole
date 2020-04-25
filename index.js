@@ -7,9 +7,9 @@ function pihole(log, config) {
 	this.log = log;
 
 	this.manufacturer = config["manufacturer"] || "Raspberry Pi";
-	this.model = config["model"] || "PiHole";
+	this.model = config["model"] || "Pi-hole";
 	this.serial = config["serial-number"] || "123-456-789";
-	this.name = config["name"] || "PiHole";
+	this.name = config["name"] || "Pi-hole";
 
 	this.auth = config["auth"] || "";
 	this.host = config["host"] || "localhost";

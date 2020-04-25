@@ -25,6 +25,9 @@ See the Pi-hole [installation section](https://github.com/pi-hole/pi-hole#one-st
 There are the following options:
 
 - `name` Required. Accessory name, default is *Pihole*.
+
+### Pi-hole Configuration
+
 - `auth` Pi-hole auth token.
 - `host` Pi-hole host, default is `localhost`.
 - `port` Pi-hole port, default is `80`.
@@ -32,12 +35,13 @@ There are the following options:
 - `logLevel` Logging level, three different levels: 0: logging disabled, 1: logs only HTTP errors, 2: logs each HTTP response. Default is set to 1.
 
 ### Device Information
-- `manufacturer` Custom manufacturer.
-- `model` Custom model.
-- `serial-number` - should be a 9 digit number in the string format *123-456-789*
-- `name` - The model name.
 
-See the [sample-config.json](sample-config.json) file to see an example of how to configure the accessory. In the example the configured accessory will disable pi-hole for a time interval of two minutes (120 seconds).
+- `manufacturer` Custom manufacturer, default is __Raspberry Pi__.
+- `model` Custom model, default is __Pi-hole__.
+- `serial-number` Should be a 9 digit number in the string format *123-456-789*.
+- `name` The model name, default is __Pi-hole__.
+
+See the [sample-config.json](sample-config.json) file to see an example of how to configure the accessory. In the example the configured accessory will disable Pi-hole for a time interval of two minutes (120 seconds).
 
 ## How to get a Pi-hole authentication token
 
