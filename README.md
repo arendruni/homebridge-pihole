@@ -24,7 +24,7 @@ See the Pi-hole [installation section](https://github.com/pi-hole/pi-hole#one-st
 
 There are the following options:
 
-- `name` Required. Accessory name, default is *Pihole*.
+- `name` Required. Accessory name, default is *Pi-hole*.
 
 ### Pi-hole Configuration
 
@@ -39,7 +39,6 @@ There are the following options:
 - `manufacturer` Custom manufacturer, default is __Raspberry Pi__.
 - `model` Custom model, default is __Pi-hole__.
 - `serial-number` Should be a 9 digit number in the string format *123-456-789*.
-- `name` The model name, default is __Pi-hole__.
 
 See the [sample-config.json](sample-config.json) file to see an example of how to configure the accessory. In the example the configured accessory will disable Pi-hole for a time interval of two minutes (120 seconds).
 
