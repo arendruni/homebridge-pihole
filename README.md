@@ -32,7 +32,7 @@ There are the following options:
 - `logLevel` Logging level, three different levels: 0: logging disabled, 1: logs only HTTP errors, 2: logs each HTTP response. Default is set to 1.
 
 ### Device Information
-- `manufactuer` Custom manufacturer.
+- `manufacturer` Custom manufacturer.
 - `model` Custom model.
 - `serial-number` - should be a 9 digit number in the string format *123-456-789*
 - `name` - The model name.
