@@ -3,7 +3,7 @@
 [![npm](https://img.shields.io/npm/v/homebridge-pihole.svg)](https://www.npmjs.com/package/homebridge-pihole)
 [![npm](https://img.shields.io/npm/dt/homebridge-pihole.svg)](https://www.npmjs.com/package/homebridge-pihole)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/8bf5a87dc8a84df6a15deb699d43ee2b)](https://www.codacy.com/manual/arendruni/homebridge-pihole?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=arendruni/homebridge-pihole&amp;utm_campaign=Badge_Grade)
-![Build Status](https://github.com/arendruni/homebridge-pihole/workflows/Main/badge.svg?branch=master)
+[![Build Status](https://github.com/arendruni/homebridge-pihole/workflows/Main/badge.svg?branch=master)](https://github.com/arendruni/homebridge-pihole/actions?query=workflow%3AMain)
 [![MIT license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 [Pi-hole](https://github.com/pi-hole/pi-hole) plugin for Homebridge
