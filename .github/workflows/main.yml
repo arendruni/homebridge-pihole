@@ -7,12 +7,13 @@ jobs:
         node-version: [6.x, 8.x, 10.x, 12.x]
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-node@v1
-      with:
-        node-version: ${{ matrix.node-version }}
-    - run: npm install
-    - run: npm test
-    - name: test script homebridge
-      run: ./test-configuration/test.sh
-      shell: bash
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - run: npm install
+      - run: npm run build
+      - run: npm test
+      - name: test script homebridge
+        run: ./test-configuration/test.sh
+        shell: bash
