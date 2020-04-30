@@ -5,9 +5,11 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "npm run clean && tsc",
-    "watch": "tsc --watch",
     "clean": "rm -rf ./dist",
-    "test": "node index.js && echo \"No syntax errors! (node $(node -v))\""
+    "postpublish": "npm run clean",
+    "prepublishOnly": "npm run build",
+    "test": "node ./dist/index.js && echo \"No syntax errors! (node $(node -v))\"",
+    "watch": "tsc --watch"
   },
   "repository": {
     "type": "git",
