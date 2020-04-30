@@ -2,8 +2,11 @@
   "name": "homebridge-pihole",
   "version": "0.1.2",
   "description": "Pihole Switch for Homebridge: https://github.com/nfarina/homebridge",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
+    "build": "npm run clean && tsc",
+    "watch": "tsc --watch",
+    "clean": "rm -rf ./dist",
     "test": "node index.js && echo \"No syntax errors! (node $(node -v))\""
   },
   "repository": {
@@ -21,7 +24,11 @@
   "homepage": "https://github.com/arendruni/homebridge-pihole#readme",
   "dependencies": {},
   "engines": {
-    "node": ">=6.0.0",
     "homebridge": ">=0.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^10.17.21",
+    "homebridge": "^1.0.3",
+    "typescript": "^3.8.3"
   }
 }
