@@ -53,7 +53,7 @@ class PiholeSwitch implements AccessoryPlugin {
 		this.port = config["port"] || 80;
 		this.logLevel = config["logLevel"] || 1;
 
-		this.informationService = new Service.AccessoryInformation()
+		this.informationService = new hap.Service.AccessoryInformation()
 			.setCharacteristic(hap.Characteristic.Manufacturer, this.manufacturer)
 			.setCharacteristic(hap.Characteristic.Model, this.model)
 			.setCharacteristic(hap.Characteristic.SerialNumber, this.serial);
