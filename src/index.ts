@@ -12,6 +12,7 @@ import {
 } from "homebridge";
 
 import * as http from "http";
+import { stringify } from "querystring";
 
 let hap: HAP;
 
@@ -20,7 +21,11 @@ export = (api: API) => {
 	api.registerAccessory("homebridge-pihole", "Pihole", PiholeSwitch);
 };
 
-const BASE_URL = "/admin/api.php";
+const BASE_URL = "/admin/api.php",
+	STATUS_URL = "status",
+	ENABLE_URL = "enable",
+	DISABLE_URL = "disable",
+	AUTH_URL = "auth";
 
 class PiholeSwitch implements AccessoryPlugin {
 
@@ -61,19 +66,21 @@ class PiholeSwitch implements AccessoryPlugin {
 		this.switchService = new hap.Service.Switch(this.name);
 		this.switchService.getCharacteristic(hap.Characteristic.On)
 			.on(CharacteristicEventTypes.GET, (next: CharacteristicGetCallback) => {
-				this._makeRequest("?status", next);
+				this._makeRequest(STATUS_URL, next);
 			})
 			.on(CharacteristicEventTypes.SET, (value: CharacteristicValue, next: CharacteristicSetCallback) => {
-				let queryString = "?enable";
+				let queryString: any = {};
 				let switchState = value as boolean;
 
-				if (!switchState) {
-					queryString = `?disable=${this.time}`;
+				if (switchState) {
+					queryString[ENABLE_URL] = 1;
+				} else {
+					queryString[DISABLE_URL] = this.time;
 				}
 
-				queryString += `&auth=${this.auth}`;
+				queryString[AUTH_URL] = this.auth;
 
-				this._makeRequest(queryString, next);
+				this._makeRequest(stringify(queryString), next);
 			});
 	}
 
@@ -118,7 +125,7 @@ class PiholeSwitch implements AccessoryPlugin {
 		let request = http.get({
 			host: this.host,
 			port: this.port,
-			path: `${BASE_URL}${path}`
+			path: `${BASE_URL}?${path}`
 		}, (response) => this._responseHandler(response, next));
 
 		request.on("error", (error) => {
