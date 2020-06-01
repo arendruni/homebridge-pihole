@@ -39,5 +39,13 @@
 		"lint-staged": "^10.2.7",
 		"prettier": "^2.0.5",
 		"typescript": "^3.8.3"
+	},
+	"lint-staged": {
+		"src/*.{js,ts}": [
+			"prettier --write"
+		],
+		"*.{json}": [
+			"prettier --write"
+		]
 	}
 }
