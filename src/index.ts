@@ -12,7 +12,6 @@ import {
 } from "homebridge";
 
 import axios, { AxiosResponse } from "axios";
-import { stringify } from "flatted";
 import {
 	LogLevel,
 	PiHoleAccessoryConfig,
@@ -133,7 +132,13 @@ class PiholeSwitch implements AccessoryPlugin {
 				responseType: "json",
 			});
 			if (this.logLevel >= LogLevel.INFO) {
-				this.log.info(stringify(response));
+				this.log.info(JSON.stringify({
+					data: response.data,
+					status: response.status,
+					statusText: response.statusText,
+					headers: response.headers,
+					request: response.config,
+				}));
 			}
 			return response.data;
 		} catch (e) {
