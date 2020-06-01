@@ -11,7 +11,6 @@ import {
 	Service,
 } from "homebridge";
 
-import * as http from "http";
 import axios, { AxiosResponse } from "axios";
 import {
 	LogLevel,
