@@ -31,6 +31,7 @@ There are the following options:
 - `auth` Pi-hole auth token.
 - `host` Pi-hole host, default is `localhost`.
 - `port` Pi-hole port, default is `80`.
+- `ssl` If the Pi-hole server should be connected to with SSL.
 - `baseDirectory` the directory where Pi-hole is found on the server, default is `/admin/`
 - `time` How long Pi-hole will be disabled, in seconds, default is 0 that means permanently disabled.
 - `logLevel` Logging level, three different levels: 0: logging disabled, 1: logs only HTTP errors, 2: logs each HTTP response. Default is set to 1.

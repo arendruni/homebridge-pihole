@@ -17,6 +17,13 @@
                 "required": false,
                 "description": "Pi-hole auth token."
             },
+            "ssl": {
+                "title": "SSL",
+                "type": "boolean",
+                "default": false,
+                "required": false,
+                "description": "If the Pi-hole server should be connected to with HTTPS."
+            },
             "host": {
                 "title": "Host",
                 "type": "string",
