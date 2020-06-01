@@ -33,6 +33,14 @@
                 "required": false,
                 "description": "Pi-hole port, default is 80."
             },
+            "baseDirectory": {
+                "title": "Base Directory",
+                "type": "string",
+                "placeholder": "/admin/",
+                "default": "/admin/",
+                "required": false,
+                "description": "The directory where the pi-hole configuration pages are located with slashes.  Typically /admin/."
+            },
             "time": {
                 "title": "Time",
                 "type": "integer",
