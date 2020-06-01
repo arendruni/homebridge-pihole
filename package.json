@@ -24,7 +24,9 @@
     "url": "https://github.com/arendruni/homebridge-pihole/issues"
   },
   "homepage": "https://github.com/arendruni/homebridge-pihole#readme",
-  "dependencies": {},
+  "dependencies": {
+    "axios": "^0.19.2"
+  },
   "engines": {
     "homebridge": ">=0.2.0"
   },
