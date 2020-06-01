@@ -13,6 +13,7 @@ import {
 
 import * as http from "http";
 import { stringify } from "querystring";
+import { LogLevel, PiHoleAccessoryConfig, PiHoleRequest, PiHoleStatusRequest, PiHoleEnableRequest, PiHoleDisableRequest, PiHoleStatusResponse } from "./types";
 
 let hap: HAP;
 
@@ -35,30 +36,37 @@ class PiholeSwitch implements AccessoryPlugin {
 	private readonly model: string;
 	private readonly serial: string;
 
-	private auth: string;
-	private host: string;
-	private baseDirectory: string;
-	private time: number;
-	private port: number;
-	private logLevel: number;
+	private readonly auth: string;
+	private readonly ssl: boolean;
+	private readonly host: string;
+	private readonly baseDirectory: string;
+	private readonly time: number;
+	private readonly port: number;
+	private readonly logLevel: LogLevel;
+
+	private readonly baseUrl: string;
 
 	private readonly switchService: Service;
 	private readonly informationService: Service;
 
 	constructor(log: Logging, config: AccessoryConfig, api: API) {
+		const piHoleConfig = config as PiHoleAccessoryConfig;
 		this.log = log;
 		this.name = config.name;
 
-		this.manufacturer = config["manufacturer"] || "Raspberry Pi";
-		this.model = config["model"] || "Pi-hole";
-		this.serial = config["serial-number"] || "123-456-789";
+		this.manufacturer = piHoleConfig.manufacturer || "Raspberry Pi";
+		this.model = piHoleConfig.model || "Pi-hole";
+		this.serial = piHoleConfig["serial-number"] || "123-456-789";
 
-		this.auth = config["auth"] || "";
-		this.host = config["host"] || "localhost";
-		this.baseDirectory = config["baseDirectory"] || "/admin/";
-		this.time = config["time"] || 0;
-		this.port = config["port"] || 80;
-		this.logLevel = config["logLevel"] || 1;
+		this.auth = piHoleConfig.auth || "";
+		this.host = piHoleConfig.host || "localhost";
+		this.baseDirectory = piHoleConfig.baseDirectory || "/admin/";
+		this.time = piHoleConfig.time || 0;
+		this.port = piHoleConfig.port || 80;
+		this.ssl = piHoleConfig.ssl || this.port == 443; // for BC
+		this.logLevel = piHoleConfig.logLevel || 1;
+
+		this.baseUrl = "http" + (this.ssl ? "s" : "") + "://" + this.host + ":" + this.port + this.baseDirectory;
 
 		this.informationService = new hap.Service.AccessoryInformation()
 			.setCharacteristic(hap.Characteristic.Manufacturer, this.manufacturer)
