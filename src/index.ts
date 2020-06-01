@@ -21,7 +21,7 @@ export = (api: API) => {
 	api.registerAccessory("homebridge-pihole", "Pihole", PiholeSwitch);
 };
 
-const BASE_URL = "/admin/api.php",
+const BASE_URL = "api.php",
 	STATUS_URL = "status",
 	ENABLE_URL = "enable",
 	DISABLE_URL = "disable",
@@ -37,6 +37,7 @@ class PiholeSwitch implements AccessoryPlugin {
 
 	private auth: string;
 	private host: string;
+	private baseDirectory: string;
 	private time: number;
 	private port: number;
 	private logLevel: number;
@@ -54,6 +55,7 @@ class PiholeSwitch implements AccessoryPlugin {
 
 		this.auth = config["auth"] || "";
 		this.host = config["host"] || "localhost";
+		this.baseDirectory = config["baseDirectory"] || "/admin/";
 		this.time = config["time"] || 0;
 		this.port = config["port"] || 80;
 		this.logLevel = config["logLevel"] || 1;
@@ -125,7 +127,7 @@ class PiholeSwitch implements AccessoryPlugin {
 		let request = http.get({
 			host: this.host,
 			port: this.port,
-			path: `${BASE_URL}?${path}`
+			path: `${this.baseDirectory}${BASE_URL}?${path}`
 		}, (response) => this._responseHandler(response, next));
 
 		request.on("error", (error) => {
