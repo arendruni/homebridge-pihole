@@ -12,7 +12,7 @@ import {
 } from "homebridge";
 
 import * as http from "http";
-import { stringify } from "querystring";
+import axios, { AxiosResponse } from "axios";
 import { LogLevel, PiHoleAccessoryConfig, PiHoleRequest, PiHoleStatusRequest, PiHoleEnableRequest, PiHoleDisableRequest, PiHoleStatusResponse } from "./types";
 
 let hap: HAP;
@@ -22,11 +22,7 @@ export = (api: API) => {
 	api.registerAccessory("homebridge-pihole", "Pihole", PiholeSwitch);
 };
 
-const BASE_URL = "api.php",
-	STATUS_URL = "status",
-	ENABLE_URL = "enable",
-	DISABLE_URL = "disable",
-	AUTH_URL = "auth";
+const BASE_API_URL = "api.php";
 
 class PiholeSwitch implements AccessoryPlugin {
 
@@ -75,22 +71,35 @@ class PiholeSwitch implements AccessoryPlugin {
 
 		this.switchService = new hap.Service.Switch(this.name);
 		this.switchService.getCharacteristic(hap.Characteristic.On)
-			.on(CharacteristicEventTypes.GET, (callback: CharacteristicGetCallback) => {
-				this._makeRequest(STATUS_URL, callback);
+			.on(CharacteristicEventTypes.GET, async (callback: CharacteristicGetCallback) => {
+				try {
+					const response = await this._makeRequest<PiHoleStatusRequest, PiHoleStatusResponse>({status: 1});
+					callback(undefined, response.status === "enabled");
+				} catch (e) {
+					callback(e);
+				}
 			})
-			.on(CharacteristicEventTypes.SET, (value: CharacteristicValue, callback: CharacteristicSetCallback) => {
-				let queryString: any = {};
+			.on(CharacteristicEventTypes.SET, async (value: CharacteristicValue, callback: CharacteristicSetCallback) => {
 				let switchState = value as boolean;
 
-				if (switchState) {
-					queryString[ENABLE_URL] = 1;
-				} else {
-					queryString[DISABLE_URL] = this.time;
+				try {
+					let response: PiHoleStatusResponse;
+					if (switchState) {
+						response = await this._makeRequest<PiHoleEnableRequest, PiHoleStatusResponse>({
+							enable: 1,
+							auth: this.auth,
+						});
+					} else {
+						response = await this._makeRequest<PiHoleDisableRequest, PiHoleStatusResponse>({
+							disable: this.time,
+							auth: this.auth,
+						});
+					}
+
+					callback(undefined, response.status === "enabled");
+				} catch (e) {
+					callback(e);
 				}
-
-				queryString[AUTH_URL] = this.auth;
-
-				this._makeRequest(stringify(queryString), callback);
 			});
 	}
 
@@ -101,47 +110,24 @@ class PiholeSwitch implements AccessoryPlugin {
 		];
 	}
 
-	private _responseHandler(response: http.IncomingMessage, callback: Function) {
-		let body = "";
-
-		response.on("data", (data) => {
-			body += data
-		});
-
-		response.on("end", () => {
-			if (this.logLevel >= 2) {
-				this.log.info(body);
+	private async _makeRequest<RequestType extends PiHoleRequest<string>, ResponseType>(params: RequestType): Promise<ResponseType> {
+		try {
+			const response: AxiosResponse<ResponseType> = await axios({
+				method: "GET",
+				url: BASE_API_URL,
+				params: params,
+				baseURL: this.baseUrl,
+				responseType: "json",
+			});
+			if (this.logLevel >= LogLevel.INFO) {
+				this.log.info(JSON.stringify(response));
 			}
-
-			try {
-				let jsonBody = JSON.parse(body);
-
-				if (jsonBody && jsonBody.status) {
-					callback(undefined, jsonBody.status == "enabled");
-				} else {
-					callback({});
-				}
-			} catch (e) {
-				if (this.logLevel >= 1) {
-					this.log.error(e);
-				}
-
-				callback(e);
+			return response.data;
+		} catch (e) {
+			if (this.logLevel >= LogLevel.ERROR) {
+				this.log.error(e);
 			}
-		});
-	}
-
-	private _makeRequest(path: string, callback: Function) {
-		let request = http.get({
-			host: this.host,
-			port: this.port,
-			path: `${this.baseDirectory}${BASE_URL}?${path}`
-		}, (response) => this._responseHandler(response, callback));
-
-		request.on("error", (error) => {
-			if (this.logLevel >= 1) {
-				this.log.error(error.toString());
-			}
-		})
+			throw e; // let the caller be responsible for callback
+		}
 	}
 }
