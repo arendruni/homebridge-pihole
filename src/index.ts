@@ -8,11 +8,20 @@ import {
 	CharacteristicValue,
 	HAP,
 	Logging,
-	Service
+	Service,
 } from "homebridge";
 
+import * as http from "http";
 import axios, { AxiosResponse } from "axios";
-import { LogLevel, PiHoleAccessoryConfig, PiHoleRequest, PiHoleStatusRequest, PiHoleEnableRequest, PiHoleDisableRequest, PiHoleStatusResponse } from "./types";
+import {
+	LogLevel,
+	PiHoleAccessoryConfig,
+	PiHoleRequest,
+	PiHoleStatusRequest,
+	PiHoleEnableRequest,
+	PiHoleDisableRequest,
+	PiHoleStatusResponse,
+} from "./types";
 
 let hap: HAP;
 
@@ -24,7 +33,6 @@ export = (api: API) => {
 const BASE_API_URL = "api.php";
 
 class PiholeSwitch implements AccessoryPlugin {
-
 	private readonly log: Logging;
 	private readonly name: string;
 	private readonly manufacturer: string;
@@ -61,7 +69,8 @@ class PiholeSwitch implements AccessoryPlugin {
 		this.ssl = piHoleConfig.ssl || this.port == 443; // for BC
 		this.logLevel = piHoleConfig.logLevel || 1;
 
-		this.baseUrl = "http" + (this.ssl ? "s" : "") + "://" + this.host + ":" + this.port + this.baseDirectory;
+		this.baseUrl =
+			"http" + (this.ssl ? "s" : "") + "://" + this.host + ":" + this.port + this.baseDirectory;
 
 		this.informationService = new hap.Service.AccessoryInformation()
 			.setCharacteristic(hap.Characteristic.Manufacturer, this.manufacturer)
@@ -69,47 +78,52 @@ class PiholeSwitch implements AccessoryPlugin {
 			.setCharacteristic(hap.Characteristic.SerialNumber, this.serial);
 
 		this.switchService = new hap.Service.Switch(this.name);
-		this.switchService.getCharacteristic(hap.Characteristic.On)
+		this.switchService
+			.getCharacteristic(hap.Characteristic.On)
 			.on(CharacteristicEventTypes.GET, async (callback: CharacteristicGetCallback) => {
 				try {
-					const response = await this._makeRequest<PiHoleStatusRequest, PiHoleStatusResponse>({status: 1});
+					const response = await this._makeRequest<PiHoleStatusRequest, PiHoleStatusResponse>({
+						status: 1,
+					});
 					callback(undefined, response.status === "enabled");
 				} catch (e) {
 					callback(e);
 				}
 			})
-			.on(CharacteristicEventTypes.SET, async (value: CharacteristicValue, callback: CharacteristicSetCallback) => {
-				let switchState = value as boolean;
+			.on(
+				CharacteristicEventTypes.SET,
+				async (value: CharacteristicValue, callback: CharacteristicSetCallback) => {
+					let switchState = value as boolean;
 
-				try {
-					let response: PiHoleStatusResponse;
-					if (switchState) {
-						response = await this._makeRequest<PiHoleEnableRequest, PiHoleStatusResponse>({
-							enable: 1,
-							auth: this.auth,
-						});
-					} else {
-						response = await this._makeRequest<PiHoleDisableRequest, PiHoleStatusResponse>({
-							disable: this.time,
-							auth: this.auth,
-						});
+					try {
+						let response: PiHoleStatusResponse;
+						if (switchState) {
+							response = await this._makeRequest<PiHoleEnableRequest, PiHoleStatusResponse>({
+								enable: 1,
+								auth: this.auth,
+							});
+						} else {
+							response = await this._makeRequest<PiHoleDisableRequest, PiHoleStatusResponse>({
+								disable: this.time,
+								auth: this.auth,
+							});
+						}
+
+						callback(undefined, response.status === "enabled");
+					} catch (e) {
+						callback(e);
 					}
-
-					callback(undefined, response.status === "enabled");
-				} catch (e) {
-					callback(e);
-				}
-			});
+				},
+			);
 	}
 
 	getServices(): Service[] {
-		return [
-			this.informationService,
-			this.switchService,
-		];
+		return [this.informationService, this.switchService];
 	}
 
-	private async _makeRequest<RequestType extends PiHoleRequest<string>, ResponseType>(params: RequestType): Promise<ResponseType> {
+	private async _makeRequest<RequestType extends PiHoleRequest, ResponseType>(
+		params: RequestType,
+	): Promise<ResponseType> {
 		try {
 			const response: AxiosResponse<ResponseType> = await axios({
 				method: "GET",
