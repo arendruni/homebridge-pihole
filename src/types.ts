@@ -26,7 +26,7 @@ export type PiHoleRequest<Endpoint extends string> = {
 	[key in Endpoint]: any; // usually a "1" or current time, argument does not matter
 };
 
-export type PiHoleAuthenticatedRequest<Endpoint> = PiHoleRequest<Endpoint> & {
+export type PiHoleAuthenticatedRequest<Endpoint extends string> = PiHoleRequest<Endpoint> & {
 	auth: string
 };
 
