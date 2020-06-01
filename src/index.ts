@@ -67,10 +67,10 @@ class PiholeSwitch implements AccessoryPlugin {
 
 		this.switchService = new hap.Service.Switch(this.name);
 		this.switchService.getCharacteristic(hap.Characteristic.On)
-			.on(CharacteristicEventTypes.GET, (next: CharacteristicGetCallback) => {
-				this._makeRequest(STATUS_URL, next);
+			.on(CharacteristicEventTypes.GET, (callback: CharacteristicGetCallback) => {
+				this._makeRequest(STATUS_URL, callback);
 			})
-			.on(CharacteristicEventTypes.SET, (value: CharacteristicValue, next: CharacteristicSetCallback) => {
+			.on(CharacteristicEventTypes.SET, (value: CharacteristicValue, callback: CharacteristicSetCallback) => {
 				let queryString: any = {};
 				let switchState = value as boolean;
 
@@ -82,7 +82,7 @@ class PiholeSwitch implements AccessoryPlugin {
 
 				queryString[AUTH_URL] = this.auth;
 
-				this._makeRequest(stringify(queryString), next);
+				this._makeRequest(stringify(queryString), callback);
 			});
 	}
 
@@ -93,7 +93,7 @@ class PiholeSwitch implements AccessoryPlugin {
 		];
 	}
 
-	private _responseHandler(response: http.IncomingMessage, next: Function) {
+	private _responseHandler(response: http.IncomingMessage, callback: Function) {
 		let body = "";
 
 		response.on("data", (data) => {
@@ -109,26 +109,26 @@ class PiholeSwitch implements AccessoryPlugin {
 				let jsonBody = JSON.parse(body);
 
 				if (jsonBody && jsonBody.status) {
-					next(undefined, jsonBody.status == "enabled");
+					callback(undefined, jsonBody.status == "enabled");
 				} else {
-					next({});
+					callback({});
 				}
 			} catch (e) {
 				if (this.logLevel >= 1) {
 					this.log.error(e);
 				}
 
-				next(e);
+				callback(e);
 			}
 		});
 	}
 
-	private _makeRequest(path: string, next: Function) {
+	private _makeRequest(path: string, callback: Function) {
 		let request = http.get({
 			host: this.host,
 			port: this.port,
 			path: `${this.baseDirectory}${BASE_URL}?${path}`
-		}, (response) => this._responseHandler(response, next));
+		}, (response) => this._responseHandler(response, callback));
 
 		request.on("error", (error) => {
 			if (this.logLevel >= 1) {
