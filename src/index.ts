@@ -51,7 +51,7 @@ class PiholeSwitch implements AccessoryPlugin {
 	private readonly switchService: Service;
 	private readonly informationService: Service;
 
-	constructor(log: Logging, config: AccessoryConfig, api: API) {
+	constructor(log: Logging, config: AccessoryConfig) {
 		const piHoleConfig = config as PiHoleAccessoryConfig;
 		this.log = log;
 		this.name = config.name;
@@ -92,7 +92,7 @@ class PiholeSwitch implements AccessoryPlugin {
 			.on(
 				CharacteristicEventTypes.SET,
 				async (value: CharacteristicValue, callback: CharacteristicSetCallback) => {
-					let switchState = value as boolean;
+					const switchState = value as boolean;
 
 					try {
 						let response: PiHoleStatusResponse;
