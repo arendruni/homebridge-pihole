@@ -48,8 +48,13 @@
 			"prettier --write",
 			"eslint"
 		],
-		"*.{json}": [
+		"./*.json": [
 			"prettier --write"
 		]
+	},
+	"husky": {
+		"hooks": {
+			"pre-commit": "lint-staged"
+		}
 	}
 }
