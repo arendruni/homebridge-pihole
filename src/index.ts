@@ -84,6 +84,7 @@ class PiholeSwitch implements AccessoryPlugin {
 					const response = await this._makeRequest<PiHoleStatusRequest, PiHoleStatusResponse>({
 						status: 1,
 					});
+
 					callback(undefined, response.status === "enabled");
 				} catch (e) {
 					callback(e);
@@ -96,6 +97,7 @@ class PiholeSwitch implements AccessoryPlugin {
 
 					try {
 						let response: PiHoleStatusResponse;
+
 						if (switchState) {
 							response = await this._makeRequest<PiHoleEnableRequest, PiHoleStatusResponse>({
 								enable: 1,
@@ -131,20 +133,25 @@ class PiholeSwitch implements AccessoryPlugin {
 				baseURL: this.baseUrl,
 				responseType: "json",
 			});
+
 			if (this.logLevel >= LogLevel.INFO) {
-				this.log.info(JSON.stringify({
-					data: response.data,
-					status: response.status,
-					statusText: response.statusText,
-					headers: response.headers,
-					request: response.config,
-				}));
+				this.log.info(
+					JSON.stringify({
+						data: response.data,
+						status: response.status,
+						statusText: response.statusText,
+						headers: response.headers,
+						request: response.config,
+					}),
+				);
 			}
+
 			return response.data;
 		} catch (e) {
 			if (this.logLevel >= LogLevel.ERROR) {
 				this.log.error(e);
 			}
+
 			throw e; // let the caller be responsible for callback
 		}
 	}
