@@ -17,6 +17,13 @@
                 "required": false,
                 "description": "Pi-hole auth token."
             },
+            "ssl": {
+                "title": "SSL",
+                "type": "boolean",
+                "default": false,
+                "required": false,
+                "description": "If the Pi-hole server should be connected to with HTTPS."
+            },
             "host": {
                 "title": "Host",
                 "type": "string",
@@ -32,6 +39,14 @@
                 "default": 80,
                 "required": false,
                 "description": "Pi-hole port, default is 80."
+            },
+            "baseDirectory": {
+                "title": "Base Directory",
+                "type": "string",
+                "placeholder": "/admin/",
+                "default": "/admin/",
+                "required": false,
+                "description": "The directory where the pi-hole configuration pages are located with slashes.  Typically /admin/."
             },
             "time": {
                 "title": "Time",

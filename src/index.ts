@@ -8,11 +8,19 @@ import {
 	CharacteristicValue,
 	HAP,
 	Logging,
-	Service
+	Service,
 } from "homebridge";
 
-import * as http from "http";
-import { stringify } from "querystring";
+import axios, { AxiosResponse } from "axios";
+import {
+	LogLevel,
+	PiHoleAccessoryConfig,
+	PiHoleRequest,
+	PiHoleStatusRequest,
+	PiHoleEnableRequest,
+	PiHoleDisableRequest,
+	PiHoleStatusResponse,
+} from "./types";
 
 let hap: HAP;
 
@@ -21,42 +29,47 @@ export = (api: API) => {
 	api.registerAccessory("homebridge-pihole", "Pihole", PiholeSwitch);
 };
 
-const BASE_URL = "/admin/api.php",
-	STATUS_URL = "status",
-	ENABLE_URL = "enable",
-	DISABLE_URL = "disable",
-	AUTH_URL = "auth";
+const BASE_API_URL = "api.php";
 
 class PiholeSwitch implements AccessoryPlugin {
-
 	private readonly log: Logging;
 	private readonly name: string;
 	private readonly manufacturer: string;
 	private readonly model: string;
 	private readonly serial: string;
 
-	private auth: string;
-	private host: string;
-	private time: number;
-	private port: number;
-	private logLevel: number;
+	private readonly auth: string;
+	private readonly ssl: boolean;
+	private readonly host: string;
+	private readonly baseDirectory: string;
+	private readonly time: number;
+	private readonly port: number;
+	private readonly logLevel: LogLevel;
+
+	private readonly baseUrl: string;
 
 	private readonly switchService: Service;
 	private readonly informationService: Service;
 
 	constructor(log: Logging, config: AccessoryConfig, api: API) {
+		const piHoleConfig = config as PiHoleAccessoryConfig;
 		this.log = log;
 		this.name = config.name;
 
-		this.manufacturer = config["manufacturer"] || "Raspberry Pi";
-		this.model = config["model"] || "Pi-hole";
-		this.serial = config["serial-number"] || "123-456-789";
+		this.manufacturer = piHoleConfig.manufacturer || "Raspberry Pi";
+		this.model = piHoleConfig.model || "Pi-hole";
+		this.serial = piHoleConfig["serial-number"] || "123-456-789";
 
-		this.auth = config["auth"] || "";
-		this.host = config["host"] || "localhost";
-		this.time = config["time"] || 0;
-		this.port = config["port"] || 80;
-		this.logLevel = config["logLevel"] || 1;
+		this.auth = piHoleConfig.auth || "";
+		this.host = piHoleConfig.host || "localhost";
+		this.baseDirectory = piHoleConfig.baseDirectory || "/admin/";
+		this.time = piHoleConfig.time || 0;
+		this.port = piHoleConfig.port || 80;
+		this.ssl = piHoleConfig.ssl || this.port == 443; // for BC
+		this.logLevel = piHoleConfig.logLevel || 1;
+
+		this.baseUrl =
+			"http" + (this.ssl ? "s" : "") + "://" + this.host + ":" + this.port + this.baseDirectory;
 
 		this.informationService = new hap.Service.AccessoryInformation()
 			.setCharacteristic(hap.Characteristic.Manufacturer, this.manufacturer)
@@ -64,74 +77,75 @@ class PiholeSwitch implements AccessoryPlugin {
 			.setCharacteristic(hap.Characteristic.SerialNumber, this.serial);
 
 		this.switchService = new hap.Service.Switch(this.name);
-		this.switchService.getCharacteristic(hap.Characteristic.On)
-			.on(CharacteristicEventTypes.GET, (next: CharacteristicGetCallback) => {
-				this._makeRequest(STATUS_URL, next);
-			})
-			.on(CharacteristicEventTypes.SET, (value: CharacteristicValue, next: CharacteristicSetCallback) => {
-				let queryString: any = {};
-				let switchState = value as boolean;
-
-				if (switchState) {
-					queryString[ENABLE_URL] = 1;
-				} else {
-					queryString[DISABLE_URL] = this.time;
+		this.switchService
+			.getCharacteristic(hap.Characteristic.On)
+			.on(CharacteristicEventTypes.GET, async (callback: CharacteristicGetCallback) => {
+				try {
+					const response = await this._makeRequest<PiHoleStatusRequest, PiHoleStatusResponse>({
+						status: 1,
+					});
+					callback(undefined, response.status === "enabled");
+				} catch (e) {
+					callback(e);
 				}
+			})
+			.on(
+				CharacteristicEventTypes.SET,
+				async (value: CharacteristicValue, callback: CharacteristicSetCallback) => {
+					let switchState = value as boolean;
 
-				queryString[AUTH_URL] = this.auth;
+					try {
+						let response: PiHoleStatusResponse;
+						if (switchState) {
+							response = await this._makeRequest<PiHoleEnableRequest, PiHoleStatusResponse>({
+								enable: 1,
+								auth: this.auth,
+							});
+						} else {
+							response = await this._makeRequest<PiHoleDisableRequest, PiHoleStatusResponse>({
+								disable: this.time,
+								auth: this.auth,
+							});
+						}
 
-				this._makeRequest(stringify(queryString), next);
-			});
+						callback(undefined, response.status === "enabled");
+					} catch (e) {
+						callback(e);
+					}
+				},
+			);
 	}
 
 	getServices(): Service[] {
-		return [
-			this.informationService,
-			this.switchService,
-		];
+		return [this.informationService, this.switchService];
 	}
 
-	private _responseHandler(response: http.IncomingMessage, next: Function) {
-		let body = "";
-
-		response.on("data", (data) => {
-			body += data
-		});
-
-		response.on("end", () => {
-			if (this.logLevel >= 2) {
-				this.log.info(body);
+	private async _makeRequest<RequestType extends PiHoleRequest, ResponseType>(
+		params: RequestType,
+	): Promise<ResponseType> {
+		try {
+			const response: AxiosResponse<ResponseType> = await axios({
+				method: "GET",
+				url: BASE_API_URL,
+				params: params,
+				baseURL: this.baseUrl,
+				responseType: "json",
+			});
+			if (this.logLevel >= LogLevel.INFO) {
+				this.log.info(JSON.stringify({
+					data: response.data,
+					status: response.status,
+					statusText: response.statusText,
+					headers: response.headers,
+					request: response.config,
+				}));
 			}
-
-			try {
-				let jsonBody = JSON.parse(body);
-
-				if (jsonBody && jsonBody.status) {
-					next(undefined, jsonBody.status == "enabled");
-				} else {
-					next({});
-				}
-			} catch (e) {
-				if (this.logLevel >= 1) {
-					this.log.error(e);
-				}
-
-				next(e);
+			return response.data;
+		} catch (e) {
+			if (this.logLevel >= LogLevel.ERROR) {
+				this.log.error(e);
 			}
-		});
-	}
-
-	private _makeRequest(path: string, next: Function) {
-		let request = http.get({
-			host: this.host,
-			port: this.port,
-			path: `${BASE_URL}?${path}`
-		}, (response) => this._responseHandler(response, next));
-
-		request.on("error", (error) => {
-			if (this.logLevel >= 1) {
-				this.log.error(error.toString());
-			}
-		})
+			throw e; // let the caller be responsible for callback
+		}
 	}
 }
