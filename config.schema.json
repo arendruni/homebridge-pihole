@@ -46,7 +46,7 @@
 				"placeholder": "/admin/",
 				"default": "/admin/",
 				"required": false,
-				"description": "The directory where the pi-hole configuration pages are located with slashes.  Typically /admin/."
+				"description": "The directory where the pi-hole configuration pages are located with slashes. Typically /admin/."
 			},
 			"time": {
 				"title": "Time",
@@ -55,6 +55,13 @@
 				"default": 0,
 				"required": false,
 				"description": "How long Pi-hole will be disabled, in seconds, default is 0 that means permanently disabled."
+			},
+			"reversed": {
+				"title": "Reversed",
+				"type": "boolean",
+				"default": false,
+				"required": false,
+				"description": "When set to true reverse the status of Pi-hole. When Pi-hole is Off the plugin will be set to On and when Pi-hole is On the plugin will be set to Off."
 			},
 			"logLevel": {
 				"title": "Loging level",
