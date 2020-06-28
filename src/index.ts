@@ -87,7 +87,10 @@ class PiholeSwitch implements AccessoryPlugin {
 						status: 1,
 					});
 
-					callback(undefined, response.status === "enabled");
+					callback(
+						undefined,
+						this.reverseStatus ? response.status === "disabled" : response.status === "enabled",
+					);
 				} catch (e) {
 					callback(e);
 				}
@@ -95,11 +98,8 @@ class PiholeSwitch implements AccessoryPlugin {
 			.on(
 				CharacteristicEventTypes.SET,
 				async (value: CharacteristicValue, callback: CharacteristicSetCallback) => {
-					let switchState = value as boolean;
-
-					if (this.reverseStatus) {
-						switchState = !switchState;
-					}
+					const newValue = value as boolean;
+					const switchState = this.reverseStatus ? !newValue : newValue;
 
 					try {
 						let response: PiHoleStatusResponse;
