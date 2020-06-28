@@ -44,7 +44,7 @@ class PiholeSwitch implements AccessoryPlugin {
 	private readonly baseDirectory: string;
 	private readonly time: number;
 	private readonly port: number;
-	private readonly reverseStatus: boolean;
+	private readonly reversed: boolean;
 	private readonly logLevel: LogLevel;
 
 	private readonly baseUrl: string;
@@ -67,7 +67,7 @@ class PiholeSwitch implements AccessoryPlugin {
 		this.time = piHoleConfig.time || 0;
 		this.port = piHoleConfig.port || 80;
 		this.ssl = piHoleConfig.ssl || this.port == 443; // for BC
-		this.reverseStatus = piHoleConfig.reverseStatus || false;
+		this.reversed = piHoleConfig.reverseStatus || false;
 		this.logLevel = piHoleConfig.logLevel || 1;
 
 		this.baseUrl =
@@ -89,7 +89,7 @@ class PiholeSwitch implements AccessoryPlugin {
 
 					callback(
 						undefined,
-						this.reverseStatus ? response.status === "disabled" : response.status === "enabled",
+						this.reversed ? response.status === "disabled" : response.status === "enabled",
 					);
 				} catch (e) {
 					callback(e);
@@ -99,7 +99,7 @@ class PiholeSwitch implements AccessoryPlugin {
 				CharacteristicEventTypes.SET,
 				async (value: CharacteristicValue, callback: CharacteristicSetCallback) => {
 					const newValue = value as boolean;
-					const switchState = this.reverseStatus ? !newValue : newValue;
+					const switchState = this.reversed ? !newValue : newValue;
 
 					try {
 						let response: PiHoleStatusResponse;

@@ -16,7 +16,7 @@ export interface PiHoleAccessoryConfig extends AccessoryConfig {
 	"baseDirectory"?: string;
 	"time"?: number;
 	"port"?: number;
-	"reverseStatus"?: boolean;
+	"reversed"?: boolean;
 	"logLevel"?: LogLevel;
 }
 
