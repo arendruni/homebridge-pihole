@@ -33,24 +33,24 @@ const BASE_API_URL = "api.php";
 
 class PiholeSwitch implements AccessoryPlugin {
 	private readonly log: Logging;
-	private readonly name: string;
 	private readonly manufacturer: string;
 	private readonly model: string;
+	private readonly name: string;
 	private readonly serial: string;
 
 	private readonly auth: string;
-	private readonly ssl: boolean;
-	private readonly host: string;
 	private readonly baseDirectory: string;
-	private readonly time: number;
+	private readonly host: string;
+	private readonly logLevel: LogLevel;
 	private readonly port: number;
 	private readonly reversed: boolean;
-	private readonly logLevel: LogLevel;
+	private readonly ssl: boolean;
+	private readonly time: number;
 
 	private readonly baseUrl: string;
 
-	private readonly switchService: Service;
 	private readonly informationService: Service;
+	private readonly switchService: Service;
 
 	constructor(log: Logging, config: AccessoryConfig) {
 		const piHoleConfig = config as PiHoleAccessoryConfig;
@@ -62,13 +62,13 @@ class PiholeSwitch implements AccessoryPlugin {
 		this.serial = piHoleConfig["serial-number"] || "123-456-789";
 
 		this.auth = piHoleConfig.auth || "";
-		this.host = piHoleConfig.host || "localhost";
 		this.baseDirectory = piHoleConfig.baseDirectory || "/admin/";
-		this.time = piHoleConfig.time || 0;
-		this.port = piHoleConfig.port || 80;
-		this.ssl = piHoleConfig.ssl || this.port == 443; // for BC
-		this.reversed = piHoleConfig.reverseStatus || false;
+		this.host = piHoleConfig.host || "localhost";
 		this.logLevel = piHoleConfig.logLevel || 1;
+		this.port = piHoleConfig.port || 80;
+		this.reversed = piHoleConfig.reversed || false;
+		this.ssl = piHoleConfig.ssl || this.port == 443; // for BC
+		this.time = piHoleConfig.time || 0;
 
 		this.baseUrl =
 			"http" + (this.ssl ? "s" : "") + "://" + this.host + ":" + this.port + this.baseDirectory;
