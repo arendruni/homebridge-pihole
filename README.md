@@ -34,6 +34,7 @@ There are the following options:
 - `ssl` If the Pi-hole server should be connected to with SSL.
 - `baseDirectory` The directory where Pi-hole is found on the server, default is `/admin/`.
 - `time` How long Pi-hole will be disabled, in seconds, default is 0 that means permanently disabled.
+- `reversed` When set to `true` reverse the status of Pi-hole. When Pi-hole is _off_ the plugin will be set to _on_ and when Pi-hole is _on_ the plugin will be set to _off_. Default is `false`.
 - `logLevel` Logging level, three different levels: 0: logging disabled, 1: logs only HTTP errors, 2: logs each HTTP response. Default is set to 1.
 
 ### Device Information
