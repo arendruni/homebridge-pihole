@@ -6,7 +6,8 @@
 [![Build Status](https://github.com/arendruni/homebridge-pihole/workflows/Main/badge.svg?branch=master)](https://github.com/arendruni/homebridge-pihole/actions?query=workflow%3AMain)
 [![MIT license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-[Pi-hole](https://github.com/pi-hole/pi-hole) plugin for Homebridge
+[Pi-hole](https://github.com/pi-hole/pi-hole) plugin for Homebridge.
+This plugin publishes a virtual switch that disables Pi-hole, making it easier to temporarily turn off the ad-blocker. Supports SSL connections and can be configured with a timer to turn Pi-hole back on.
 
 ## Requirements
 
