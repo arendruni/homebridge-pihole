@@ -44,6 +44,7 @@ class PiholeSwitch implements AccessoryPlugin {
 	private readonly baseDirectory: string;
 	private readonly time: number;
 	private readonly port: number;
+	private readonly reverseStatus: boolean;
 	private readonly logLevel: LogLevel;
 
 	private readonly baseUrl: string;
@@ -66,6 +67,7 @@ class PiholeSwitch implements AccessoryPlugin {
 		this.time = piHoleConfig.time || 0;
 		this.port = piHoleConfig.port || 80;
 		this.ssl = piHoleConfig.ssl || this.port == 443; // for BC
+		this.reverseStatus = piHoleConfig.reverseStatus || false;
 		this.logLevel = piHoleConfig.logLevel || 1;
 
 		this.baseUrl =
@@ -93,7 +95,11 @@ class PiholeSwitch implements AccessoryPlugin {
 			.on(
 				CharacteristicEventTypes.SET,
 				async (value: CharacteristicValue, callback: CharacteristicSetCallback) => {
-					const switchState = value as boolean;
+					let switchState = value as boolean;
+
+					if (this.reverseStatus) {
+						switchState = !switchState;
+					}
 
 					try {
 						let response: PiHoleStatusResponse;
