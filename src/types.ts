@@ -14,6 +14,7 @@ export interface PiHoleAccessoryConfig extends AccessoryConfig {
 	"manufacturer"?: string;
 	"model"?: string;
 	"port"?: number;
+	"rejectUnauthorized"?: boolean;
 	"reversed"?: boolean;
 	"serial-number"?: string;
 	"ssl"?: boolean;

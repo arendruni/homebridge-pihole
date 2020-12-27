@@ -33,6 +33,7 @@ There are the following options:
 - `host` Pi-hole host, default is `localhost`.
 - `port` Pi-hole port, default is `80`.
 - `ssl` If the Pi-hole server should be connected to with SSL.
+- `rejectUnauthorized` If the HTTPS agent should check the validity of SSL cert, set it to `false` to allow self-signed certs to work. Default is `true`.
 - `baseDirectory` The directory where Pi-hole is found on the server, default is `/admin/`.
 - `time` How long Pi-hole will be disabled, in seconds, default is 0 that means permanently disabled.
 - `reversed` When set to `true` reverse the status of Pi-hole. When Pi-hole is _off_ the plugin will be set to _on_ and when Pi-hole is _on_ the plugin will be set to _off_. Default is `false`.

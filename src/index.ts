@@ -1,3 +1,4 @@
+import axios, { AxiosResponse } from "axios";
 import {
 	AccessoryConfig,
 	AccessoryPlugin,
@@ -10,15 +11,14 @@ import {
 	Logging,
 	Service,
 } from "homebridge";
-
-import axios, { AxiosResponse } from "axios";
+import { Agent } from "https";
 import {
 	LogLevel,
 	PiHoleAccessoryConfig,
+	PiHoleDisableRequest,
+	PiHoleEnableRequest,
 	PiHoleRequest,
 	PiHoleStatusRequest,
-	PiHoleEnableRequest,
-	PiHoleDisableRequest,
 	PiHoleStatusResponse,
 } from "./types";
 
@@ -45,6 +45,7 @@ class PiholeSwitch implements AccessoryPlugin {
 	private readonly port: number;
 	private readonly reversed: boolean;
 	private readonly ssl: boolean;
+	private readonly rejectUnauthorized: boolean;
 	private readonly time: number;
 
 	private readonly baseUrl: string;
@@ -66,6 +67,7 @@ class PiholeSwitch implements AccessoryPlugin {
 		this.host = piHoleConfig.host || "localhost";
 		this.logLevel = piHoleConfig.logLevel || 1;
 		this.port = piHoleConfig.port || 80;
+		this.rejectUnauthorized = piHoleConfig.rejectUnauthorized ?? true;
 		this.reversed = piHoleConfig.reversed || false;
 		this.ssl = piHoleConfig.ssl || this.port == 443; // for BC
 		this.time = piHoleConfig.time || 0;
@@ -132,12 +134,17 @@ class PiholeSwitch implements AccessoryPlugin {
 		params: RequestType,
 	): Promise<ResponseType> {
 		try {
+			const httpsAgent = new Agent({
+				rejectUnauthorized: this.rejectUnauthorized,
+			});
+
 			const response: AxiosResponse<ResponseType> = await axios({
 				method: "GET",
 				url: BASE_API_URL,
 				params: params,
 				baseURL: this.baseUrl,
 				responseType: "json",
+				httpsAgent: httpsAgent,
 			});
 
 			if (this.logLevel >= LogLevel.INFO) {

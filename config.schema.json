@@ -24,6 +24,13 @@
 				"required": false,
 				"description": "If the Pi-hole server should be connected to with HTTPS."
 			},
+			"rejectUnauthorized": {
+				"title": "Reject Unauthorized",
+				"type": "boolean",
+				"default": true,
+				"required": false,
+				"description": "If the HTTPS agent should check the validity of SSL cert."
+			},
 			"host": {
 				"title": "Host",
 				"type": "string",
