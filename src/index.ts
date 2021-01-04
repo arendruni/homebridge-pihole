@@ -118,7 +118,7 @@ class PiholeSwitch implements AccessoryPlugin {
 							});
 						}
 
-						callback(undefined, response.status === "enabled");
+						callback(undefined);
 					} catch (e) {
 						callback(e);
 					}
