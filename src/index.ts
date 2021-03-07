@@ -85,14 +85,17 @@ class PiholeSwitch implements AccessoryPlugin {
 			.getCharacteristic(hap.Characteristic.On)
 			.on(CharacteristicEventTypes.GET, async (callback: CharacteristicGetCallback) => {
 				try {
-					const response = await this._makeRequest<PiHoleStatusRequest, PiHoleStatusResponse>({
+					const { value: oldValue } = this.switchService.getCharacteristic(hap.Characteristic.On);
+
+					callback(undefined, oldValue);
+
+					const { status } = await this._makeRequest<PiHoleStatusRequest, PiHoleStatusResponse>({
 						status: 1,
 					});
 
-					callback(
-						undefined,
-						this.reversed ? response.status === "disabled" : response.status === "enabled",
-					);
+					this.switchService
+						.getCharacteristic(hap.Characteristic.On)
+						.updateValue(this.reversed ? status === "disabled" : status === "enabled");
 				} catch (e) {
 					callback(e);
 				}
@@ -106,6 +109,8 @@ class PiholeSwitch implements AccessoryPlugin {
 					try {
 						let response: PiHoleStatusResponse;
 
+						callback(undefined);
+
 						if (switchState) {
 							response = await this._makeRequest<PiHoleEnableRequest, PiHoleStatusResponse>({
 								enable: 1,
@@ -118,7 +123,11 @@ class PiholeSwitch implements AccessoryPlugin {
 							});
 						}
 
-						callback(undefined);
+						this.switchService
+							.getCharacteristic(hap.Characteristic.On)
+							.updateValue(
+								this.reversed ? response.status === "disabled" : response.status === "enabled",
+							);
 					} catch (e) {
 						callback(e);
 					}
