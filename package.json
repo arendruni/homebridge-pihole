@@ -33,6 +33,7 @@
 		"homebridge": ">=0.2.0"
 	},
 	"devDependencies": {
+		"@types/axios": "^0.14.0",
 		"@types/node": "^10.17.21",
 		"@typescript-eslint/eslint-plugin": "^3.0.2",
 		"@typescript-eslint/parser": "^3.0.2",
