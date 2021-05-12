@@ -163,7 +163,13 @@ class PiholeSwitch implements AccessoryPlugin {
 						status: response.status,
 						statusText: response.statusText,
 						headers: response.headers,
-						request: response.config,
+						request: {
+							method: "GET",
+							url: BASE_API_URL,
+							params: params,
+							baseURL: this.baseUrl,
+							responseType: "json",
+						},
 					}),
 				);
 			}
