@@ -97,7 +97,9 @@ class PiholeSwitch implements AccessoryPlugin {
 						.getCharacteristic(hap.Characteristic.On)
 						.updateValue(this.reversed ? status === "disabled" : status === "enabled");
 				} catch (e) {
-					callback(e);
+					if (this.logLevel >= LogLevel.ERROR) {
+						this.log.error(e);
+					}
 				}
 			})
 			.on(
@@ -129,7 +131,9 @@ class PiholeSwitch implements AccessoryPlugin {
 								this.reversed ? response.status === "disabled" : response.status === "enabled",
 							);
 					} catch (e) {
-						callback(e);
+						if (this.logLevel >= LogLevel.ERROR) {
+							this.log.error(e);
+						}
 					}
 				},
 			);
@@ -142,45 +146,37 @@ class PiholeSwitch implements AccessoryPlugin {
 	private async _makeRequest<RequestType extends PiHoleRequest, ResponseType>(
 		params: RequestType,
 	): Promise<ResponseType> {
-		try {
-			const httpsAgent = new Agent({
-				rejectUnauthorized: this.rejectUnauthorized,
-			});
+		const httpsAgent = new Agent({
+			rejectUnauthorized: this.rejectUnauthorized,
+		});
 
-			const response: AxiosResponse<ResponseType> = await axios({
-				method: "GET",
-				url: BASE_API_URL,
-				params: params,
-				baseURL: this.baseUrl,
-				responseType: "json",
-				httpsAgent: httpsAgent,
-			});
+		const response: AxiosResponse<ResponseType> = await axios({
+			method: "GET",
+			url: BASE_API_URL,
+			params: params,
+			baseURL: this.baseUrl,
+			responseType: "json",
+			httpsAgent: httpsAgent,
+		});
 
-			if (this.logLevel >= LogLevel.INFO) {
-				this.log.info(
-					JSON.stringify({
-						data: response.data,
-						status: response.status,
-						statusText: response.statusText,
-						headers: response.headers,
-						request: {
-							method: "GET",
-							url: BASE_API_URL,
-							params: params,
-							baseURL: this.baseUrl,
-							responseType: "json",
-						},
-					}),
-				);
-			}
-
-			return response.data;
-		} catch (e) {
-			if (this.logLevel >= LogLevel.ERROR) {
-				this.log.error(e);
-			}
-
-			throw e; // let the caller be responsible for callback
+		if (this.logLevel >= LogLevel.INFO) {
+			this.log.info(
+				JSON.stringify({
+					data: response.data,
+					status: response.status,
+					statusText: response.statusText,
+					headers: response.headers,
+					request: {
+						method: "GET",
+						url: BASE_API_URL,
+						params: params,
+						baseURL: this.baseUrl,
+						responseType: "json",
+					},
+				}),
+			);
 		}
+
+		return response.data;
 	}
 }
