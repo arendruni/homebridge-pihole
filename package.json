@@ -1,6 +1,6 @@
 {
 	"name": "homebridge-pihole",
-	"version": "0.4.1",
+	"version": "0.4.2-beta.0",
 	"description": "Pihole Switch for Homebridge: https://github.com/nfarina/homebridge",
 	"main": "dist/index.js",
 	"scripts": {
