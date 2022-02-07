@@ -89,9 +89,7 @@ class PiholeSwitch implements AccessoryPlugin {
 
 					callback(undefined, oldValue);
 
-					const { status } = await this._makeRequest<PiHoleStatusRequest, PiHoleStatusResponse>({
-						status: 1,
-					});
+					const { status } = await this._makeRequest<PiHoleRequest, PiHoleStatusResponse>({});
 
 					this.switchService
 						.getCharacteristic(hap.Characteristic.On)
