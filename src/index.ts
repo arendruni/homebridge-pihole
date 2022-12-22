@@ -91,6 +91,7 @@ class PiholeSwitch implements AccessoryPlugin {
 
 					const { status } = await this._makeRequest<PiHoleStatusRequest, PiHoleStatusResponse>({
 						status: 1,
+						auth: this.auth,
 					});
 
 					this.switchService
