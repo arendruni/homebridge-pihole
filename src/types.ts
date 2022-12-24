@@ -29,7 +29,7 @@ export interface PiHoleAuthenticatedRequest extends PiHoleRequest {
 }
 
 // from https://discourse.pi-hole.net/t/pi-hole-api/1863
-export interface PiHoleStatusRequest extends PiHoleRequest {
+export interface PiHoleStatusRequest extends PiHoleAuthenticatedRequest {
 	status: number;
 }
 export interface PiHoleEnableRequest extends PiHoleAuthenticatedRequest {
