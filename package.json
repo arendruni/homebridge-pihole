@@ -1,8 +1,8 @@
 {
 	"name": "homebridge-pihole",
-	"displayName": "Pi Hole",
+	"displayName": "Pi-hole",
 	"version": "0.4.2",
-	"description": "Pihole Switch for Homebridge: https://github.com/nfarina/homebridge",
+	"description": "Pi-hole Switch for Homebridge: https://github.com/nfarina/homebridge",
 	"main": "dist/index.js",
 	"scripts": {
 		"build": "npm run clean && tsc",
