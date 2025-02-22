@@ -1,86 +1,73 @@
-import axios, { AxiosResponse } from "axios";
 import {
-	AccessoryConfig,
 	AccessoryPlugin,
 	API,
 	CharacteristicEventTypes,
 	CharacteristicGetCallback,
 	CharacteristicSetCallback,
 	CharacteristicValue,
-	HAP,
 	Logging,
 	Service,
 } from "homebridge";
-import { Agent } from "https";
 import {
 	LogLevel,
 	PiHoleAccessoryConfig,
+	PiholeConfig,
 	PiHoleDisableRequest,
 	PiHoleEnableRequest,
 	PiHoleRequest,
 	PiHoleStatusRequest,
 	PiHoleStatusResponse,
 } from "./types";
+import axios, { AxiosResponse } from "axios";
+import { Agent } from "https";
 
-let hap: HAP;
-
-export = (api: API) => {
-	hap = api.hap;
+export default (api: API): void => {
 	api.registerAccessory("homebridge-pihole", "Pihole", PiholeSwitch);
 };
 
 const BASE_API_URL = "api.php";
 
+const DEFAULT_CONFIG: Required<PiholeConfig> = {
+	"manufacturer": "Raspberry Pi",
+	"model": "Pi-hole",
+	"serial-number": "123-456-789",
+	"auth": "",
+	"baseDirectory": "/admin/",
+	"host": "localhost",
+	"logLevel": LogLevel.INFO,
+	"port": 80,
+	"rejectUnauthorized": true,
+	"reversed": false,
+	"ssl": false,
+	"time": 0,
+};
+
 class PiholeSwitch implements AccessoryPlugin {
-	private readonly log: Logging;
-	private readonly manufacturer: string;
-	private readonly model: string;
-	private readonly name: string;
-	private readonly serial: string;
-
-	private readonly auth: string;
-	private readonly baseDirectory: string;
-	private readonly host: string;
 	private readonly logLevel: LogLevel;
-	private readonly port: number;
-	private readonly reversed: boolean;
-	private readonly ssl: boolean;
-	private readonly rejectUnauthorized: boolean;
-	private readonly time: number;
 
+	private readonly rejectUnauthorized: boolean;
 	private readonly baseUrl: string;
 
 	private readonly informationService: Service;
 	private readonly switchService: Service;
 
-	constructor(log: Logging, config: AccessoryConfig) {
-		const piHoleConfig = config as PiHoleAccessoryConfig;
-		this.log = log;
-		this.name = config.name;
+	constructor(private log: Logging, _config: PiHoleAccessoryConfig, api: API) {
+		const { hap } = api;
+		const { auth, reversed, ...config } = { ...DEFAULT_CONFIG, ..._config };
 
-		this.manufacturer = piHoleConfig.manufacturer || "Raspberry Pi";
-		this.model = piHoleConfig.model || "Pi-hole";
-		this.serial = piHoleConfig["serial-number"] || "123-456-789";
+		this.logLevel = config.logLevel;
+		this.rejectUnauthorized = config.rejectUnauthorized;
 
-		this.auth = piHoleConfig.auth || "";
-		this.baseDirectory = piHoleConfig.baseDirectory || "/admin/";
-		this.host = piHoleConfig.host || "localhost";
-		this.logLevel = piHoleConfig.logLevel || 1;
-		this.port = piHoleConfig.port || 80;
-		this.rejectUnauthorized = piHoleConfig.rejectUnauthorized ?? true;
-		this.reversed = piHoleConfig.reversed || false;
-		this.ssl = piHoleConfig.ssl || this.port == 443; // for BC
-		this.time = piHoleConfig.time || 0;
-
-		this.baseUrl =
-			"http" + (this.ssl ? "s" : "") + "://" + this.host + ":" + this.port + this.baseDirectory;
+		this.baseUrl = `http${config.ssl ? "s" : ""}://${config.host}:${config.port}${
+			config.baseDirectory
+		}`;
 
 		this.informationService = new hap.Service.AccessoryInformation()
-			.setCharacteristic(hap.Characteristic.Manufacturer, this.manufacturer)
-			.setCharacteristic(hap.Characteristic.Model, this.model)
-			.setCharacteristic(hap.Characteristic.SerialNumber, this.serial);
+			.setCharacteristic(hap.Characteristic.Manufacturer, config.manufacturer)
+			.setCharacteristic(hap.Characteristic.Model, config.model)
+			.setCharacteristic(hap.Characteristic.SerialNumber, config["serial-number"]);
 
-		this.switchService = new hap.Service.Switch(this.name);
+		this.switchService = new hap.Service.Switch(config.name);
 		this.switchService
 			.getCharacteristic(hap.Characteristic.On)
 			.on(CharacteristicEventTypes.GET, async (callback: CharacteristicGetCallback) => {
@@ -91,15 +78,15 @@ class PiholeSwitch implements AccessoryPlugin {
 
 					const { status } = await this._makeRequest<PiHoleStatusRequest, PiHoleStatusResponse>({
 						status: 1,
-						auth: this.auth,
+						auth,
 					});
 
 					this.switchService
 						.getCharacteristic(hap.Characteristic.On)
-						.updateValue(this.reversed ? status === "disabled" : status === "enabled");
+						.updateValue(reversed ? status === "disabled" : status === "enabled");
 				} catch (e) {
 					if (this.logLevel >= LogLevel.ERROR) {
-						this.log.error(e);
+						this.log.error("Error", e);
 					}
 				}
 			})
@@ -107,7 +94,7 @@ class PiholeSwitch implements AccessoryPlugin {
 				CharacteristicEventTypes.SET,
 				async (value: CharacteristicValue, callback: CharacteristicSetCallback) => {
 					const newValue = value as boolean;
-					const switchState = this.reversed ? !newValue : newValue;
+					const switchState = reversed ? !newValue : newValue;
 
 					try {
 						let response: PiHoleStatusResponse;
@@ -117,23 +104,23 @@ class PiholeSwitch implements AccessoryPlugin {
 						if (switchState) {
 							response = await this._makeRequest<PiHoleEnableRequest, PiHoleStatusResponse>({
 								enable: 1,
-								auth: this.auth,
+								auth,
 							});
 						} else {
 							response = await this._makeRequest<PiHoleDisableRequest, PiHoleStatusResponse>({
-								disable: this.time,
-								auth: this.auth,
+								disable: config.time,
+								auth,
 							});
 						}
 
 						this.switchService
 							.getCharacteristic(hap.Characteristic.On)
 							.updateValue(
-								this.reversed ? response.status === "disabled" : response.status === "enabled",
+								reversed ? response.status === "disabled" : response.status === "enabled",
 							);
 					} catch (e) {
 						if (this.logLevel >= LogLevel.ERROR) {
-							this.log.error(e);
+							this.log.error("Error", e);
 						}
 					}
 				},

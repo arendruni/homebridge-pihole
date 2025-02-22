@@ -6,7 +6,7 @@ export enum LogLevel {
 	INFO = 2,
 }
 
-export interface PiHoleAccessoryConfig extends AccessoryConfig {
+export type PiholeConfig = {
 	"auth"?: string;
 	"baseDirectory"?: string;
 	"host"?: string;
@@ -19,7 +19,9 @@ export interface PiHoleAccessoryConfig extends AccessoryConfig {
 	"serial-number"?: string;
 	"ssl"?: boolean;
 	"time"?: number;
-}
+};
+
+export type PiHoleAccessoryConfig = PiholeConfig & AccessoryConfig;
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface PiHoleRequest {}
