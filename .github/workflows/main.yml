@@ -5,6 +5,7 @@ jobs:
     strategy:
       matrix:
         node-version: [18.x, 20.x, 22.x]
+        homebridge-version: [latest, ^2.0.0-beta]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -17,3 +18,5 @@ jobs:
       - name: test script homebridge
         run: ./test-configuration/test.sh
         shell: bash
+        env:
+          HOMEBRIDGE_VERSION: ${{ matrix.homebridge-version }}
