@@ -51,7 +51,11 @@ class PiholeSwitch implements AccessoryPlugin {
 	private readonly informationService: Service;
 	private readonly switchService: Service;
 
-	constructor(private log: Logging, _config: PiHoleAccessoryConfig, api: API) {
+	constructor(
+		private log: Logging,
+		_config: PiHoleAccessoryConfig,
+		api: API,
+	) {
 		const { hap } = api;
 		const { auth, reversed, ...config } = { ...DEFAULT_CONFIG, ..._config };
 

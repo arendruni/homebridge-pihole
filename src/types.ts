@@ -23,7 +23,7 @@ export type PiholeConfig = {
 
 export type PiHoleAccessoryConfig = PiholeConfig & AccessoryConfig;
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
+// eslint-disable-next-line @typescript-eslint/no-empty-interface,, @typescript-eslint/no-empty-object-type
 export interface PiHoleRequest {}
 
 export interface PiHoleAuthenticatedRequest extends PiHoleRequest {
