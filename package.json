@@ -30,14 +30,13 @@
 	},
 	"homepage": "https://github.com/arendruni/homebridge-pihole#readme",
 	"dependencies": {
-		"axios": "^0.21.1"
+		"undici": "^7.3.0"
 	},
 	"engines": {
 		"homebridge": "^1.6.0 || ^2.0.0-beta.0",
 		"node": "^18.20.4 || ^20.15.1"
 	},
 	"devDependencies": {
-		"@types/axios": "^0.14.0",
 		"@types/node": "^20",
 		"@typescript-eslint/eslint-plugin": "^8.24.1",
 		"@typescript-eslint/parser": "^8.24.1",
