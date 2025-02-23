@@ -29,7 +29,7 @@ There are the following options:
 
 ### Pi-hole Configuration
 
-- `auth` Pi-hole auth token.
+- `auth` Pi-hole password, see the section on [how to get an app password](#how-to-get-a-pi-hole-app-password).
 - `host` Pi-hole host, default is `localhost`.
 - `port` Pi-hole port, default is `80`.
 - `ssl` If the Pi-hole server should be connected to with SSL.
@@ -47,10 +47,9 @@ There are the following options:
 
 See the [sample-config.json](sample-config.json) file to see an example of how to configure the accessory. In the example the configured accessory will disable Pi-hole for a time interval of two minutes (120 seconds).
 
-## How to get a Pi-hole authentication token
+## How to get a Pi-hole app password
 
 1. Login into your Pi-hole Admin Console.
-2. Navigate to the _Settings_ page and then to the _API / Web interface_ tab.
-3. At the bottom of the page click on the _Show API Token_ button, a popup window will ask for confirmation, go ahead and click on _Yes, show API token_.
-4. A new window will open showing a QR code, copy the _Raw API Token_ below the QR code.
-5. Paste your API token in the homebridge configuration file.
+2. Navigate to the _Settings_ page and then to the  _Web interface / API_ tab, and enable the _Expert_ settings.
+3. In the _Advanced Settings_ panel, click on the _Configure app password_ button, a popup window will ask for confirmation, go ahead and copy the app password then click on _Enable new app password_.
+4. Paste your App password in the homebridge-pihole configuration file.

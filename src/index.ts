@@ -1,174 +1,119 @@
-import {
-	AccessoryPlugin,
-	API,
-	CharacteristicEventTypes,
-	CharacteristicGetCallback,
-	CharacteristicSetCallback,
-	CharacteristicValue,
-	Logging,
-	Service,
-} from "homebridge";
-import {
-	LogLevel,
-	PiHoleAccessoryConfig,
-	PiholeConfig,
-	PiHoleDisableRequest,
-	PiHoleEnableRequest,
-	PiHoleRequest,
-	PiHoleStatusRequest,
-	PiHoleStatusResponse,
-} from "./types";
-import axios, { AxiosResponse } from "axios";
-import { Agent } from "https";
+import { AccessoryPlugin, API, HAP, Logging, Service } from "homebridge";
+import { BlockingResponse, PiholeClient, PiholeResponse } from "./piholeClient";
+import { LogLevel, PiHoleAccessoryConfig } from "./types";
 
 export default (api: API): void => {
 	api.registerAccessory("homebridge-pihole", "Pihole", PiholeSwitch);
 };
 
-const BASE_API_URL = "api.php";
-
-const DEFAULT_CONFIG: Required<PiholeConfig> = {
+const DEFAULT_CONFIG = {
 	"manufacturer": "Raspberry Pi",
 	"model": "Pi-hole",
 	"serial-number": "123-456-789",
-	"auth": "",
-	"baseDirectory": "/admin/",
+	"baseDirectory": "/api",
 	"host": "localhost",
 	"logLevel": LogLevel.INFO,
-	"port": 80,
 	"rejectUnauthorized": true,
 	"reversed": false,
-	"ssl": false,
-	"time": 0,
-};
+} as const;
 
 class PiholeSwitch implements AccessoryPlugin {
 	private readonly logLevel: LogLevel;
 
-	private readonly rejectUnauthorized: boolean;
-	private readonly baseUrl: string;
-
 	private readonly informationService: Service;
 	private readonly switchService: Service;
+
+	private readonly piholeClient: PiholeClient;
+
+	private readonly hap: HAP;
 
 	constructor(
 		private log: Logging,
 		_config: PiHoleAccessoryConfig,
 		api: API,
 	) {
-		const { hap } = api;
+		({ hap: this.hap } = api);
 		const { auth, reversed, ...config } = { ...DEFAULT_CONFIG, ..._config };
 
 		this.logLevel = config.logLevel;
-		this.rejectUnauthorized = config.rejectUnauthorized;
 
-		this.baseUrl = `http${config.ssl ? "s" : ""}://${config.host}:${config.port}${
-			config.baseDirectory
-		}`;
+		this.piholeClient = new PiholeClient(
+			{
+				auth,
+				host: config.host,
+				https: config.ssl,
+				path: config.baseDirectory,
+				port: config.port,
+				rejectUnauthorized: config.rejectUnauthorized,
+				logLevel: config.logLevel,
+			},
+			log,
+		);
 
-		this.informationService = new hap.Service.AccessoryInformation()
-			.setCharacteristic(hap.Characteristic.Manufacturer, config.manufacturer)
-			.setCharacteristic(hap.Characteristic.Model, config.model)
-			.setCharacteristic(hap.Characteristic.SerialNumber, config["serial-number"]);
+		this.informationService = new this.hap.Service.AccessoryInformation()
+			.setCharacteristic(this.hap.Characteristic.Manufacturer, config.manufacturer)
+			.setCharacteristic(this.hap.Characteristic.Model, config.model)
+			.setCharacteristic(this.hap.Characteristic.SerialNumber, config["serial-number"]);
 
-		this.switchService = new hap.Service.Switch(config.name);
+		this.switchService = new this.hap.Service.Switch(config.name);
 		this.switchService
-			.getCharacteristic(hap.Characteristic.On)
-			.on(CharacteristicEventTypes.GET, async (callback: CharacteristicGetCallback) => {
+			.getCharacteristic(this.hap.Characteristic.On)
+			.onGet(async () => {
 				try {
-					const { value: oldValue } = this.switchService.getCharacteristic(hap.Characteristic.On);
+					const response = await this.piholeClient.getBlocking();
 
-					callback(undefined, oldValue);
-
-					const { status } = await this._makeRequest<PiHoleStatusRequest, PiHoleStatusResponse>({
-						status: 1,
-						auth,
-					});
-
-					this.switchService
-						.getCharacteristic(hap.Characteristic.On)
-						.updateValue(reversed ? status === "disabled" : status === "enabled");
+					return this.postRequest(response, reversed);
 				} catch (e) {
 					if (this.logLevel >= LogLevel.ERROR) {
 						this.log.error("Error", e);
 					}
+
+					throw e;
 				}
 			})
-			.on(
-				CharacteristicEventTypes.SET,
-				async (value: CharacteristicValue, callback: CharacteristicSetCallback) => {
-					const newValue = value as boolean;
-					const switchState = reversed ? !newValue : newValue;
+			.onSet(async (value) => {
+				const newValue = value as boolean;
+				const switchState = reversed ? !newValue : newValue;
 
-					try {
-						let response: PiHoleStatusResponse;
+				try {
+					const response = await this.piholeClient.setBlocking(
+						switchState,
+						switchState === false ? config.time : undefined,
+					);
 
-						callback(undefined);
-
-						if (switchState) {
-							response = await this._makeRequest<PiHoleEnableRequest, PiHoleStatusResponse>({
-								enable: 1,
-								auth,
-							});
-						} else {
-							response = await this._makeRequest<PiHoleDisableRequest, PiHoleStatusResponse>({
-								disable: config.time,
-								auth,
-							});
-						}
-
-						this.switchService
-							.getCharacteristic(hap.Characteristic.On)
-							.updateValue(
-								reversed ? response.status === "disabled" : response.status === "enabled",
-							);
-					} catch (e) {
-						if (this.logLevel >= LogLevel.ERROR) {
-							this.log.error("Error", e);
-						}
+					this.postRequest(response, reversed);
+				} catch (e) {
+					if (this.logLevel >= LogLevel.ERROR) {
+						this.log.error("Error", e);
 					}
-				},
-			);
+
+					throw e;
+				}
+			});
 	}
 
 	getServices(): Service[] {
 		return [this.informationService, this.switchService];
 	}
 
-	private async _makeRequest<RequestType extends PiHoleRequest, ResponseType>(
-		params: RequestType,
-	): Promise<ResponseType> {
-		const httpsAgent = new Agent({
-			rejectUnauthorized: this.rejectUnauthorized,
-		});
+	private postRequest(response: PiholeResponse<BlockingResponse>, reversed: boolean) {
+		const {
+			body: { blocking },
+			response: { statusCode },
+		} = response;
 
-		const response: AxiosResponse<ResponseType> = await axios({
-			method: "GET",
-			url: BASE_API_URL,
-			params: params,
-			baseURL: this.baseUrl,
-			responseType: "json",
-			httpsAgent: httpsAgent,
-		});
-
-		if (this.logLevel >= LogLevel.INFO) {
-			this.log.info(
-				JSON.stringify({
-					data: response.data,
-					status: response.status,
-					statusText: response.statusText,
-					headers: response.headers,
-					request: {
-						method: "GET",
-						url: BASE_API_URL,
-						params: params,
-						baseURL: this.baseUrl,
-						responseType: "json",
-					},
-				}),
-			);
+		if (statusCode >= 400) {
+			throw new Error("Api Error", { cause: response });
 		}
 
-		return response.data;
+		if (this.logLevel >= LogLevel.INFO) {
+			this.log.info(JSON.stringify({ ...response, response: { ...response.response, body: {} } }));
+		}
+
+		if (blocking === "disabled" || blocking === "enabled") {
+			return reversed ? blocking === "disabled" : blocking === "enabled";
+		} else {
+			throw new Error("Invalid status", { cause: { blocking } });
+		}
 	}
 }
