@@ -45,7 +45,6 @@ export class PiholeClient {
 		private readonly options: PiholeClientOptions,
 		readonly logger: Logger,
 	) {
-		console.log(options);
 		const url = new URL(this.options.path ?? "/api", this.options.baseUrl);
 		this.baseUrl = url.toString();
 
