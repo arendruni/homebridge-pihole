@@ -29,7 +29,7 @@
 				"type": "string",
 				"placeholder": "http://localhost",
 				"default": "http://localhost",
-				"required": true,
+				"required": false,
 				"description": "Pi-hole base URL, default is http://localhost"
 			},
 			"path": {
