@@ -1,6 +1,6 @@
 import { AccessoryPlugin, API, HAP, Logging, Service } from "homebridge";
 import { BlockingResponse, PiholeClient, PiholeResponse } from "./piholeClient";
-import { LogLevel, PiHoleAccessoryConfig } from "./types";
+import { LogLevel, PiHoleAccessoryConfig, PiholeConfig } from "./types";
 
 export default (api: API): void => {
 	api.registerAccessory("homebridge-pihole", "Pihole", PiholeSwitch);
@@ -10,12 +10,12 @@ const DEFAULT_CONFIG = {
 	"manufacturer": "Raspberry Pi",
 	"model": "Pi-hole",
 	"serial-number": "123-456-789",
-	"baseDirectory": "/api",
-	"host": "localhost",
+	"path": "/api",
+	"baseUrl": "http://localhost",
 	"logLevel": LogLevel.INFO,
 	"rejectUnauthorized": true,
 	"reversed": false,
-} as const;
+} as const satisfies PiholeConfig;
 
 class PiholeSwitch implements AccessoryPlugin {
 	private readonly logLevel: LogLevel;
@@ -40,10 +40,8 @@ class PiholeSwitch implements AccessoryPlugin {
 		this.piholeClient = new PiholeClient(
 			{
 				auth,
-				host: config.host,
-				https: config.ssl,
-				path: config.baseDirectory,
-				port: config.port,
+				baseUrl: config.baseUrl,
+				path: config.path,
 				rejectUnauthorized: config.rejectUnauthorized,
 				logLevel: config.logLevel,
 			},

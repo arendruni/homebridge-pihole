@@ -8,17 +8,15 @@ export enum LogLevel {
 
 export type PiholeConfig = {
 	"auth"?: string;
-	"baseDirectory"?: string;
-	"host"?: string;
-	"logLevel"?: LogLevel;
+	"path"?: string;
+	"baseUrl"?: string;
+	"rejectUnauthorized"?: boolean;
 	"manufacturer"?: string;
 	"model"?: string;
-	"port"?: number;
-	"rejectUnauthorized"?: boolean;
-	"reversed"?: boolean;
 	"serial-number"?: string;
-	"ssl"?: boolean;
+	"reversed"?: boolean;
 	"time"?: number;
+	"logLevel"?: LogLevel;
 };
 
 export type PiHoleAccessoryConfig = PiholeConfig & AccessoryConfig;

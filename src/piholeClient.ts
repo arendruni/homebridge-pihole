@@ -5,10 +5,8 @@ import { LogLevel } from "./types";
 interface PiholeClientOptions {
 	auth?: string;
 	path?: string;
-	host: string;
-	port?: number;
+	baseUrl: string;
 	rejectUnauthorized: boolean;
-	https?: boolean;
 	logLevel: LogLevel;
 }
 
@@ -41,15 +39,21 @@ export class PiholeClient {
 	private dispatcher?: Dispatcher;
 	private session?: Session;
 
-	private get baseUrl(): string {
-		return `${this.options.https ? "https" : "http"}://${this.options.host}:${this.options.port ?? (this.options.https ? 443 : 80)}${this.options.path ?? "/api"}`;
-	}
+	private readonly baseUrl: string;
 
 	constructor(
 		private readonly options: PiholeClientOptions,
 		readonly logger: Logger,
 	) {
-		if (options.https === true && options.rejectUnauthorized === false) {
+		console.log(options);
+		const url = new URL(this.options.path ?? "/api", this.options.baseUrl);
+		this.baseUrl = url.toString();
+
+		if (this.baseUrl.endsWith("/")) {
+			this.baseUrl = this.baseUrl.slice(0, -1);
+		}
+
+		if (url.protocol === "https:" && options.rejectUnauthorized === false) {
 			this.dispatcher = new Agent({ connect: { rejectUnauthorized: options.rejectUnauthorized } });
 		}
 	}
@@ -59,7 +63,7 @@ export class PiholeClient {
 		path: `/${string}`,
 		body?: unknown,
 	): Promise<PiholeResponse<Res>> {
-		const url = this.baseUrl.concat(path);
+		const url = `${this.baseUrl}${path}`;
 
 		if (this.options.logLevel >= LogLevel.INFO) {
 			this.logger.info("Request", {

@@ -8,7 +8,7 @@
 				"title": "Name",
 				"type": "string",
 				"required": true,
-				"default": "Pihole",
+				"default": "Pi-hole",
 				"description": "A unique name for the accessory. It will be used as the accessory name in HomeKit."
 			},
 			"auth": {
@@ -17,13 +17,6 @@
 				"required": false,
 				"description": "Pi-hole auth token."
 			},
-			"ssl": {
-				"title": "SSL",
-				"type": "boolean",
-				"default": false,
-				"required": false,
-				"description": "If the Pi-hole server should be connected to with HTTPS."
-			},
 			"rejectUnauthorized": {
 				"title": "Reject Unauthorized",
 				"type": "boolean",
@@ -31,29 +24,21 @@
 				"required": false,
 				"description": "If the HTTPS agent should check the validity of SSL cert."
 			},
-			"host": {
-				"title": "Host",
+			"baseUrl": {
+				"title": "Base URL",
 				"type": "string",
-				"placeholder": "localhost",
-				"default": "localhost",
-				"required": false,
-				"description": "Pi-hole host, default is localhost."
+				"placeholder": "http://localhost",
+				"default": "http://localhost",
+				"required": true,
+				"description": "Pi-hole base URL, default is http://localhost"
 			},
-			"port": {
-				"title": "Port",
-				"type": "integer",
-				"placeholder": "80",
-				"default": 80,
-				"required": false,
-				"description": "Pi-hole port, default is 80."
-			},
-			"baseDirectory": {
-				"title": "Base Directory",
+			"path": {
+				"title": "Path",
 				"type": "string",
-				"placeholder": "/admin/",
-				"default": "/admin/",
+				"placeholder": "/api",
+				"default": "/api",
 				"required": false,
-				"description": "The directory where the pi-hole configuration pages are located with slashes. Typically /admin/."
+				"description": "The directory where the Pi-hole dashboard is located. Typically /api."
 			},
 			"time": {
 				"title": "Time",

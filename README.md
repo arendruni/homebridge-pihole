@@ -29,12 +29,10 @@ There are the following options:
 
 ### Pi-hole Configuration
 
-- `auth` Pi-hole password, see the section on [how to get an app password](#how-to-get-a-pi-hole-app-password).
-- `host` Pi-hole host, default is `localhost`.
-- `port` Pi-hole port, default is `80`.
-- `ssl` If the Pi-hole server should be connected to with SSL.
+- `auth` Pi-hole password or app password when using 2FA, see the section on [how to get an app password](#how-to-get-a-pi-hole-app-password).
+- `baseUrl` Pi-hole base URL, default is `http://localhost`.
+- `path` The directory where the Pi-hole dashboard is located. Default is `/api`.
 - `rejectUnauthorized` If the HTTPS agent should check the validity of SSL cert, set it to `false` to allow self-signed certs to work. Default is `true`.
-- `baseDirectory` The directory where Pi-hole is found on the server, default is `/admin/`.
 - `time` How long Pi-hole will be disabled, in seconds, default is 0 that means permanently disabled.
 - `reversed` When set to `true` reverse the status of Pi-hole. When Pi-hole is _off_ the plugin will be set to _on_ and when Pi-hole is _on_ the plugin will be set to _off_. Default is `false`.
 - `logLevel` Logging level, three different levels: 0: logging disabled, 1: logs only HTTP errors, 2: logs each HTTP response. Default is set to 1.
