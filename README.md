@@ -29,12 +29,10 @@ There are the following options:
 
 ### Pi-hole Configuration
 
-- `auth` Pi-hole auth token.
-- `host` Pi-hole host, default is `localhost`.
-- `port` Pi-hole port, default is `80`.
-- `ssl` If the Pi-hole server should be connected to with SSL.
+- `auth` Pi-hole password or app password when using 2FA, see the section on [how to get an app password](#how-to-get-a-pi-hole-app-password).
+- `baseUrl` Pi-hole base URL, default is `http://localhost`.
+- `path` The directory where the Pi-hole dashboard is located. Default is `/api`.
 - `rejectUnauthorized` If the HTTPS agent should check the validity of SSL cert, set it to `false` to allow self-signed certs to work. Default is `true`.
-- `baseDirectory` The directory where Pi-hole is found on the server, default is `/admin/`.
 - `time` How long Pi-hole will be disabled, in seconds, default is 0 that means permanently disabled.
 - `reversed` When set to `true` reverse the status of Pi-hole. When Pi-hole is _off_ the plugin will be set to _on_ and when Pi-hole is _on_ the plugin will be set to _off_. Default is `false`.
 - `logLevel` Logging level, three different levels: 0: logging disabled, 1: logs only HTTP errors, 2: logs each HTTP response. Default is set to 1.
@@ -47,10 +45,9 @@ There are the following options:
 
 See the [sample-config.json](sample-config.json) file to see an example of how to configure the accessory. In the example the configured accessory will disable Pi-hole for a time interval of two minutes (120 seconds).
 
-## How to get a Pi-hole authentication token
+## How to get a Pi-hole app password
 
 1. Login into your Pi-hole Admin Console.
-2. Navigate to the _Settings_ page and then to the _API / Web interface_ tab.
-3. At the bottom of the page click on the _Show API Token_ button, a popup window will ask for confirmation, go ahead and click on _Yes, show API token_.
-4. A new window will open showing a QR code, copy the _Raw API Token_ below the QR code.
-5. Paste your API token in the homebridge configuration file.
+2. Navigate to the _Settings_ page and then to the  _Web interface / API_ tab, and enable the _Expert_ settings.
+3. In the _Advanced Settings_ panel, click on the _Configure app password_ button, a popup window will ask for confirmation, go ahead and copy the app password then click on _Enable new app password_.
+4. Paste your App password in the homebridge-pihole configuration file.

@@ -11,12 +11,9 @@
 		{
 			"accessory": "Pihole",
 			"name": "pi-hole - test",
-			"host": "pihole.raspi.io",
+			"baseUrl": "https://pihole.raspi.io",
 			"rejectUnauthorized": false,
 			"auth": "998ed4d621742d0c2d85ed84173db569afa194d4597686cae947324aa58ab4bb",
-            "ssl": false,
-            "port": 80,
-            "baseDirectory": "/admin/",
 			"reversed": true,
 			"time": 120
 		}
