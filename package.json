@@ -31,19 +31,20 @@
 		"axios": "^0.21.1"
 	},
 	"engines": {
-		"homebridge": ">=0.2.0"
+		"homebridge": "^1.6.0 || ^2.0.0-beta.0",
+		"node": "^18.20.4 || ^20.15.1"
 	},
 	"devDependencies": {
 		"@types/axios": "^0.14.0",
-		"@types/node": "^10.17.21",
+		"@types/node": "^20",
 		"@typescript-eslint/eslint-plugin": "^3.0.2",
 		"@typescript-eslint/parser": "^3.0.2",
 		"eslint": "^7.1.0",
-		"homebridge": "^1.0.3",
+		"homebridge": "^1.6.0",
 		"husky": "^4.2.5",
 		"lint-staged": "^10.2.7",
 		"prettier": "^2.0.5",
-		"typescript": "^3.8.3"
+		"typescript": "^5"
 	},
 	"lint-staged": {
 		"src/*.{js,ts}": [
