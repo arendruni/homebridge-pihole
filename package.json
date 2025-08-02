@@ -30,7 +30,7 @@
 	},
 	"homepage": "https://github.com/arendruni/homebridge-pihole#readme",
 	"dependencies": {
-		"undici": "^7.13.0"
+		"undici": "^7.12.0"
 	},
 	"engines": {
 		"homebridge": "^1.6.0 || ^2.0.0-beta.0",
