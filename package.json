@@ -41,7 +41,7 @@
 		"@typescript-eslint/eslint-plugin": "^8.24.1",
 		"@typescript-eslint/parser": "^8.24.1",
 		"eslint": "^8.57.1",
-		"homebridge": "^1.6.0",
+		"homebridge": "^1.11.1",
 		"husky": "^9.1.7",
 		"lint-staged": "^15.4.1",
 		"prettier": "^3.5.2",
