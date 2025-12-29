@@ -5,7 +5,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node-version: [18.x, 20.x, 22.x]
+        node-version: [18.x, 20.x, 22.x, 24.x]
         homebridge-version: [latest, ^2.0.0-beta]
     runs-on: ubuntu-latest
     steps:
