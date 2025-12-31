@@ -15,6 +15,7 @@ const DEFAULT_CONFIG = {
 	"logLevel": LogLevel.INFO,
 	"rejectUnauthorized": true,
 	"reversed": false,
+	"persistSession": false,
 } as const satisfies PiholeConfig;
 
 class PiholeSwitch implements AccessoryPlugin {
@@ -44,8 +45,12 @@ class PiholeSwitch implements AccessoryPlugin {
 				path: config.path,
 				rejectUnauthorized: config.rejectUnauthorized,
 				logLevel: config.logLevel,
-				storagePath: api.user.storagePath(),
-				serialNumber: api.hap.uuid.generate(config.name.concat(config["serial-number"])),
+				sessionPath: config.persistSession
+					? PiholeClient.getFilePath(
+							api.user.storagePath(),
+							api.hap.uuid.generate(config.name.concat(config["serial-number"])),
+						)
+					: undefined,
 			},
 			log,
 		);

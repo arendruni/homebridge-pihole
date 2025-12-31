@@ -8,10 +8,9 @@ interface PiholeClientOptions {
 	auth?: string;
 	path?: string;
 	baseUrl: string;
-	serialNumber: string;
 	rejectUnauthorized: boolean;
 	logLevel: LogLevel;
-	storagePath?: string;
+	sessionPath?: string;
 }
 
 export type BlockingResponse = {
@@ -61,7 +60,7 @@ export class PiholeClient {
 		}
 	}
 
-	private static getFilePath(path: string, serialNumber: string): string {
+	static getFilePath(path: string, serialNumber: string): string {
 		return join(path, `pihole-session-${serialNumber}.json`);
 	}
 
@@ -112,14 +111,12 @@ export class PiholeClient {
 	}
 
 	private async loadSession() {
-		if (!(this.options.storagePath && this.options.serialNumber)) {
+		if (!this.options.sessionPath) {
 			return;
 		}
 
-		const filePath = PiholeClient.getFilePath(this.options.storagePath, this.options.serialNumber);
-
 		try {
-			const data = await readFile(filePath, "utf-8");
+			const data = await readFile(this.options.sessionPath, "utf-8");
 			const session = JSON.parse(data);
 
 			if (session && session.sid) {
@@ -136,14 +133,12 @@ export class PiholeClient {
 	}
 
 	private async saveSession(session: Session) {
-		if (!(this.options.storagePath && this.options.serialNumber)) {
+		if (!this.options.sessionPath) {
 			return;
 		}
 
-		const filePath = PiholeClient.getFilePath(this.options.storagePath, this.options.serialNumber);
-
 		try {
-			await writeFile(filePath, JSON.stringify(session), "utf-8");
+			await writeFile(this.options.sessionPath, JSON.stringify(session), "utf-8");
 
 			this.logInfo("Session saved to disk");
 		} catch (e) {
