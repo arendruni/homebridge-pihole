@@ -10,6 +10,7 @@
 		"postpublish": "npm run clean",
 		"prepublishOnly": "npm run build",
 		"test": "node ./dist/index.js && echo \"No syntax errors! (node $(node -v))\"",
+		"test:jest": "jest",
 		"prettify": "prettier --write 'src/*.{js,ts}' '*.json'",
 		"lint": "eslint 'src/*.{js,ts}'",
 		"husky:precommit": "lint-staged",
@@ -37,14 +38,17 @@
 		"node": "^18.15.0 || ^20.7.0 || ^22 || ^24"
 	},
 	"devDependencies": {
+		"@types/jest": "^30.0.0",
 		"@types/node": "^20",
 		"@typescript-eslint/eslint-plugin": "^8.24.1",
 		"@typescript-eslint/parser": "^8.24.1",
 		"eslint": "^8.57.1",
 		"homebridge": "^1.11.1",
 		"husky": "^9.1.7",
+		"jest": "^30.2.0",
 		"lint-staged": "^15.4.1",
 		"prettier": "^3.5.2",
+		"ts-jest": "^29.4.6",
 		"typescript": "^5"
 	},
 	"lint-staged": {
