@@ -44,6 +44,8 @@ class PiholeSwitch implements AccessoryPlugin {
 				path: config.path,
 				rejectUnauthorized: config.rejectUnauthorized,
 				logLevel: config.logLevel,
+				storagePath: api.user.storagePath(),
+				serialNumber: api.hap.uuid.generate(config.name.concat(config["serial-number"])),
 			},
 			log,
 		);

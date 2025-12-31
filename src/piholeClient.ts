@@ -1,4 +1,6 @@
+import { readFile, writeFile } from "fs/promises";
 import { Logger } from "homebridge";
+import { join } from "path";
 import { Agent, Dispatcher, request } from "undici";
 import { LogLevel } from "./types";
 
@@ -6,8 +8,10 @@ interface PiholeClientOptions {
 	auth?: string;
 	path?: string;
 	baseUrl: string;
+	serialNumber: string;
 	rejectUnauthorized: boolean;
 	logLevel: LogLevel;
+	storagePath?: string;
 }
 
 export type BlockingResponse = {
@@ -57,6 +61,10 @@ export class PiholeClient {
 		}
 	}
 
+	private static getFilePath(path: string, serialNumber: string): string {
+		return join(path, `pihole-session-${serialNumber}.json`);
+	}
+
 	private async makeRequest<Res>(
 		method: "GET" | "POST",
 		path: `/${string}`,
@@ -65,13 +73,11 @@ export class PiholeClient {
 	): Promise<PiholeResponse<Res>> {
 		const url = `${this.baseUrl}${path}`;
 
-		if (this.options.logLevel >= LogLevel.INFO) {
-			this.logger.info("Request", {
-				method,
-				body,
-				url,
-			});
-		}
+		this.logInfo("Request", {
+			method,
+			body,
+			url,
+		});
 
 		const response = await request(url, {
 			method,
@@ -86,15 +92,13 @@ export class PiholeClient {
 
 		const responseBody = await response.body.json();
 
-		if (this.options.logLevel >= LogLevel.INFO) {
-			this.logger.info("Response", {
-				method,
-				body,
-				responseBody,
-				response: { ...response, body: {} },
-				url,
-			});
-		}
+		this.logInfo("Response", {
+			method,
+			body,
+			responseBody,
+			response: { ...response, body: {} },
+			url,
+		});
 
 		if (typeof responseBody !== "object" || responseBody === null) {
 			throw new Error("Invalid response", { cause: JSON.stringify({ response, responseBody }) });
@@ -107,7 +111,51 @@ export class PiholeClient {
 		return { body: responseBody as Res, response };
 	}
 
+	private async loadSession() {
+		if (!(this.options.storagePath && this.options.serialNumber)) {
+			return;
+		}
+
+		const filePath = PiholeClient.getFilePath(this.options.storagePath, this.options.serialNumber);
+
+		try {
+			const data = await readFile(filePath, "utf-8");
+			const session = JSON.parse(data);
+
+			if (session && session.sid) {
+				this.session = session;
+				this.logInfo("Session loaded from disk");
+			}
+		} catch (e) {
+			if (typeof e === "object" && e !== null && "code" in e && e.code === "ENOENT") {
+				this.logInfo("Session not found on disk");
+			} else {
+				this.logError("Failed to load session", e);
+			}
+		}
+	}
+
+	private async saveSession(session: Session) {
+		if (!(this.options.storagePath && this.options.serialNumber)) {
+			return;
+		}
+
+		const filePath = PiholeClient.getFilePath(this.options.storagePath, this.options.serialNumber);
+
+		try {
+			await writeFile(filePath, JSON.stringify(session), "utf-8");
+
+			this.logInfo("Session saved to disk");
+		} catch (e) {
+			this.logError("Failed to save session", e);
+		}
+	}
+
 	private async setupSession() {
+		if (!this.session) {
+			await this.loadSession();
+		}
+
 		const { body } = await this.makeRequest<SessionResponse>("GET", "/auth", undefined);
 
 		if (!body.session.valid) {
@@ -124,6 +172,7 @@ export class PiholeClient {
 			}
 
 			this.session = body.session;
+			await this.saveSession(body.session);
 		} else {
 			this.session = body.session;
 		}
@@ -139,5 +188,19 @@ export class PiholeClient {
 		await this.setupSession();
 
 		return this.makeRequest<BlockingResponse>("GET", "/dns/blocking");
+	}
+
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	logError(message: string, ...parameters: any[]) {
+		if (this.options.logLevel >= LogLevel.ERROR) {
+			this.logger.error(message, ...parameters);
+		}
+	}
+
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	logInfo(message: string, ...parameters: any[]) {
+		if (this.options.logLevel >= LogLevel.INFO) {
+			this.logger.info(message, ...parameters);
+		}
 	}
 }
