@@ -8,10 +8,9 @@ jobs:
       matrix:
         node-version: [18.x, 20.x, 22.x, 24.x]
         test-type: [Jest, Homebridge]
-        include:
-          - test-type: Homebridge
-            hb-version: latest
-          - test-type: Homebridge
+        hb-version: [latest, ^2.0.0-beta]
+        exclude:
+          - test-type: Jest
             hb-version: ^2.0.0-beta
     runs-on: ubuntu-latest
     steps:
