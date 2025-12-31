@@ -97,12 +97,7 @@ class PiholeSwitch implements AccessoryPlugin {
 	private postRequest(response: PiholeResponse<BlockingResponse>, reversed: boolean) {
 		const {
 			body: { blocking },
-			response: { statusCode },
 		} = response;
-
-		if (statusCode >= 400) {
-			throw new Error("Api Error", { cause: response });
-		}
 
 		if (this.logLevel >= LogLevel.INFO) {
 			this.log.info(JSON.stringify({ ...response, response: { ...response.response, body: {} } }));

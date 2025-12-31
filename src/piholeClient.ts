@@ -61,6 +61,7 @@ export class PiholeClient {
 		method: "GET" | "POST",
 		path: `/${string}`,
 		body?: unknown,
+		throwOnError = true,
 	): Promise<PiholeResponse<Res>> {
 		const url = `${this.baseUrl}${path}`;
 
@@ -78,12 +79,12 @@ export class PiholeClient {
 			body: body ? JSON.stringify(body) : undefined,
 			headers: {
 				"Content-Type": "application/json",
-				"User-Agent": "PiholeClient",
+				"User-Agent": "homebridge-pihole",
 				...(this.session?.sid ? { "X-FTL-SID": this.session.sid } : {}),
 			},
 		});
 
-		const responseBody = (await response.body.json()) as Res;
+		const responseBody = await response.body.json();
 
 		if (this.options.logLevel >= LogLevel.INFO) {
 			this.logger.info("Response", {
@@ -95,7 +96,15 @@ export class PiholeClient {
 			});
 		}
 
-		return { body: responseBody, response };
+		if (typeof responseBody !== "object" || responseBody === null) {
+			throw new Error("Invalid response", { cause: JSON.stringify({ response, responseBody }) });
+		}
+
+		if (throwOnError && "error" in responseBody) {
+			throw new Error("Api Error", { cause: JSON.stringify({ response, responseBody }) });
+		}
+
+		return { body: responseBody as Res, response };
 	}
 
 	private async setupSession() {
