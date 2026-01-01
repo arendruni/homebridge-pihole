@@ -12,7 +12,7 @@ on:
 
 jobs:
   integration-test:
-    name: Test integration
+    name: Test integration (Node ${{ inputs.node-version }}, Homebridge ${{ inputs.hb-version }})
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -27,7 +27,7 @@ jobs:
         env:
           HOMEBRIDGE_VERSION: ${{ matrix.homebridge-version }}
   e2e-tests:
-    name: Test e2e
+    name: Test e2e (Node ${{ inputs.node-version }}, Homebridge ${{ inputs.hb-version }})
     runs-on: ubuntu-latest
     env:
       PIHOLE_IMAGE: pihole/pihole:latest
