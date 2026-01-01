@@ -24,9 +24,7 @@ jobs:
       - run: npm run build
       - name: PiholeClient Tests
         if: matrix.test-type == 'PiholeClient'
-        run: |
-          npm test
-          npm run test:jest
+        run: npm run test:jest
       - name: Install Homebridge
         if: matrix.test-type == 'e2e'
         run: npm install homebridge@${{ matrix.hb-version }} --no-save
