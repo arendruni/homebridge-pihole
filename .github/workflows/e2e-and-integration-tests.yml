@@ -20,6 +20,7 @@ jobs:
         with:
           node-version: ${{ inputs.node-version }}
       - run: npm install
+      - run: npm run build
       - name: test script homebridge
         run: ./test-configuration/test.sh
         shell: bash
@@ -36,6 +37,7 @@ jobs:
         with:
           node-version: ${{ inputs.node-version }}
       - run: npm install
+      - run: npm run build
       - name: Install Homebridge
         run: npm install homebridge@${{ inputs.hb-version }} --no-save
       - name: Pull Pi-hole Image
