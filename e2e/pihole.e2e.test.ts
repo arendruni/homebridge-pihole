@@ -211,7 +211,20 @@ describe("Pihole Plugin E2E with Docker", () => {
 			const acc = await getAccessory("Pihole Normal");
 			const switchService = acc.services.find((s: any) => s.type.includes("49"));
 			const onChar = switchService.characteristics.find((c: any) => c.type.includes("25"));
-			expect([true, 1]).toContain(onChar.value);
+			
+			// Force a fresh fetch from Pi-hole by reading the characteristic directly
+			const { body } = await request(
+				`http://localhost:${HOMEBRIDGE_PORT}/characteristics?id=${acc.aid}.${onChar.iid}`,
+				{
+					headers: {
+						"Authorization": "031-45-154",
+					},
+				},
+			);
+			const freshData = (await body.json()) as any;
+			const freshValue = freshData.characteristics[0].value;
+			
+			expect([true, 1]).toContain(freshValue);
 		});
 
 		it("should disable Pi-hole when turned OFF", async () => {
@@ -233,7 +246,20 @@ describe("Pihole Plugin E2E with Docker", () => {
 			const acc = await getAccessory("Pihole Reversed");
 			const switchService = acc.services.find((s: any) => s.type.includes("49"));
 			const onChar = switchService.characteristics.find((c: any) => c.type.includes("25"));
-			expect([false, 0]).toContain(onChar.value);
+			
+			// Force a fresh fetch from Pi-hole by reading the characteristic directly
+			const { body } = await request(
+				`http://localhost:${HOMEBRIDGE_PORT}/characteristics?id=${acc.aid}.${onChar.iid}`,
+				{
+					headers: {
+						"Authorization": "031-45-154",
+					},
+				},
+			);
+			const freshData = (await body.json()) as any;
+			const freshValue = freshData.characteristics[0].value;
+			
+			expect([false, 0]).toContain(freshValue);
 		});
 
 		it("should disable Pi-hole when turned ON", async () => {
