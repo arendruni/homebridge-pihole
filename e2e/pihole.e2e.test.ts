@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { ChildProcess, spawn } from "child_process";
 import * as fs from "fs";
-import { Server } from "homebridge/lib/server";
-import { User } from "homebridge/lib/user";
 import * as path from "path";
 import { GenericContainer, StartedTestContainer, Wait } from "testcontainers";
 import { request } from "undici";
@@ -12,7 +11,7 @@ const CONFIG_PATH = path.join(STORAGE_PATH, "config.json");
 
 describe("Pihole Plugin E2E with Docker", () => {
 	let container: StartedTestContainer;
-	let hbServer: any;
+	let hbProcess: ChildProcess;
 	let piholeUrl: string;
 	const piholePassword = "test-password";
 
@@ -92,9 +91,14 @@ describe("Pihole Plugin E2E with Docker", () => {
 			.withEnvironment({
 				WEBPASSWORD: piholePassword,
 				FTLCONF_webserver_api_password: piholePassword,
-				FTLCONF_webserver_api_rate_limit_login: "0", // Disable login rate limiting for tests
 				TZ: "UTC",
 			})
+			.withCopyFilesToContainer([
+				{
+					source: path.join(__dirname, "pihole.toml"),
+					target: "/etc/pihole/pihole.toml",
+				},
+			])
 			.withExposedPorts(80)
 			.withWaitStrategy(Wait.forHttp("/admin/login", 80).forStatusCode(200))
 			.start();
@@ -161,17 +165,27 @@ describe("Pihole Plugin E2E with Docker", () => {
 		fs.writeFileSync(CONFIG_PATH, JSON.stringify(config));
 
 		// Initialize Homebridge
-		User.setStoragePath(STORAGE_PATH);
-		hbServer = new Server({
-			customPluginPath: path.resolve(__dirname, "../"),
-			insecureAccess: true,
-			forceColourLogging: false,
-			noLogTimestamps: true,
-			hideQRCode: true,
-		});
-
 		console.log("Starting Homebridge...");
-		await hbServer.start();
+		const hbBin = path.resolve(require.resolve("homebridge"), "../../bin/homebridge");
+
+		hbProcess = spawn(
+			process.execPath,
+			[
+				hbBin,
+				"-U",
+				STORAGE_PATH,
+				"-P",
+				path.resolve(__dirname, "../"),
+				"-I",
+				"--no-qrcode",
+				"--no-timestamp",
+			],
+			{
+				stdio: "inherit",
+				env: { ...process.env },
+			},
+		);
+
 		// Give it a moment to initialize
 		await new Promise((resolve) => setTimeout(resolve, 5000));
 	}, 300000);
@@ -180,13 +194,8 @@ describe("Pihole Plugin E2E with Docker", () => {
 		if (container) {
 			await container.stop();
 		}
-		if (hbServer) {
-			if (hbServer._httpServer) {
-				hbServer._httpServer.close();
-			}
-			if (hbServer._bridge) {
-				hbServer._bridge.unpublish();
-			}
+		if (hbProcess) {
+			hbProcess.kill();
 		}
 	});
 
