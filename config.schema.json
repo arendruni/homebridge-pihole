@@ -55,8 +55,15 @@
 				"required": false,
 				"description": "When set to true reverse the status of Pi-hole. When Pi-hole is Off the plugin will be set to On and when Pi-hole is On the plugin will be set to Off."
 			},
+			"persistSession": {
+				"title": "Persist Session",
+				"type": "boolean",
+				"default": false,
+				"required": false,
+				"description": "If the session should be persisted to disk. Default is false."
+			},
 			"logLevel": {
-				"title": "Loging level",
+				"title": "Logging level",
 				"type": "integer",
 				"placeholder": "1",
 				"default": 1,

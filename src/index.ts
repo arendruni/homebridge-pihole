@@ -15,6 +15,7 @@ const DEFAULT_CONFIG = {
 	"logLevel": LogLevel.INFO,
 	"rejectUnauthorized": true,
 	"reversed": false,
+	"persistSession": false,
 } as const satisfies PiholeConfig;
 
 class PiholeSwitch implements AccessoryPlugin {
@@ -44,6 +45,12 @@ class PiholeSwitch implements AccessoryPlugin {
 				path: config.path,
 				rejectUnauthorized: config.rejectUnauthorized,
 				logLevel: config.logLevel,
+				sessionPath: config.persistSession
+					? PiholeClient.getFilePath(
+							api.user.storagePath(),
+							api.hap.uuid.generate(config.name.concat(config["serial-number"])),
+						)
+					: undefined,
 			},
 			log,
 		);
@@ -97,12 +104,7 @@ class PiholeSwitch implements AccessoryPlugin {
 	private postRequest(response: PiholeResponse<BlockingResponse>, reversed: boolean) {
 		const {
 			body: { blocking },
-			response: { statusCode },
 		} = response;
-
-		if (statusCode >= 400) {
-			throw new Error("Api Error", { cause: response });
-		}
 
 		if (this.logLevel >= LogLevel.INFO) {
 			this.log.info(JSON.stringify({ ...response, response: { ...response.response, body: {} } }));

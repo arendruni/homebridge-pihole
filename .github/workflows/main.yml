@@ -1,23 +1,14 @@
 name: Main
+
 on: [push, pull_request]
+
 jobs:
-  build:
+  node-versions-matrix:
+    name: Node ${{ matrix.node-version }}
     strategy:
       fail-fast: false
       matrix:
-        node-version: [18.x, 20.x, 22.x]
-        homebridge-version: [latest, ^2.0.0-beta]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: ${{ matrix.node-version }}
-      - run: npm install
-      - run: npm run build
-      - run: npm test
-      - name: test script homebridge
-        run: ./test-configuration/test.sh
-        shell: bash
-        env:
-          HOMEBRIDGE_VERSION: ${{ matrix.homebridge-version }}
+        node-version: ["20.x", "22.x", "24.x"]
+    uses: ./.github/workflows/build-and-test.yml
+    with:
+      node-version: ${{ matrix.node-version }}

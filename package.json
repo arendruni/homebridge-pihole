@@ -1,7 +1,7 @@
 {
 	"name": "homebridge-pihole",
 	"displayName": "Pi-hole",
-	"version": "1.0.1",
+	"version": "1.1.0-beta.0",
 	"description": "Pi-hole Switch for Homebridge: https://github.com/nfarina/homebridge",
 	"main": "dist/index.js",
 	"scripts": {
@@ -9,7 +9,9 @@
 		"clean": "rm -rf ./dist",
 		"postpublish": "npm run clean",
 		"prepublishOnly": "npm run build",
-		"test": "node ./dist/index.js && echo \"No syntax errors! (node $(node -v))\"",
+		"test": "npm run test:jest && npm run test:e2e",
+		"test:jest": "jest --config jest.config.js",
+		"test:e2e": "jest --config jest.e2e.config.js --forceExit",
 		"prettify": "prettier --write 'src/*.{js,ts}' '*.json'",
 		"lint": "eslint 'src/*.{js,ts}'",
 		"husky:precommit": "lint-staged",
@@ -34,17 +36,21 @@
 	},
 	"engines": {
 		"homebridge": "^1.6.0 || ^2.0.0-beta.0",
-		"node": "^18.20.4 || ^20.15.1 || ^22"
+		"node": "^20.7.0 || ^22 || ^24"
 	},
 	"devDependencies": {
+		"@types/jest": "^30.0.0",
 		"@types/node": "^20",
 		"@typescript-eslint/eslint-plugin": "^8.24.1",
 		"@typescript-eslint/parser": "^8.24.1",
 		"eslint": "^8.57.1",
-		"homebridge": "^1.6.0",
+		"homebridge": "^1.11.1",
 		"husky": "^9.1.7",
+		"jest": "^30.2.0",
 		"lint-staged": "^15.4.1",
 		"prettier": "^3.5.2",
+		"testcontainers": "^11.11.0",
+		"ts-jest": "^29.4.6",
 		"typescript": "^5"
 	},
 	"lint-staged": {

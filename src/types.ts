@@ -17,6 +17,7 @@ export type PiholeConfig = {
 	"reversed"?: boolean;
 	"time"?: number;
 	"logLevel"?: LogLevel;
+	"persistSession"?: boolean;
 };
 
 export type PiHoleAccessoryConfig = PiholeConfig & AccessoryConfig;

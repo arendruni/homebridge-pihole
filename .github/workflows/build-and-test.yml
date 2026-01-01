@@ -1,0 +1,45 @@
+name: Build and Test Workflow
+
+on:
+  workflow_call:
+    inputs:
+      node-version:
+        required: true
+        type: string
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.node-version }}
+      - run: npm install
+      - run: npm run build
+  e2e-and-integration-tests:
+    needs: build
+    strategy:
+      fail-fast: false
+      matrix:
+        hb-version: ["latest", "^2.0.0-beta"]
+        include:
+          - node-version: ${{ inputs.node-version }}
+    name: Launch e2e and integration tests
+    uses: ./.github/workflows/e2e-and-integration-tests.yml
+    with:
+      node-version: ${{ inputs.node-version }}
+      hb-version: ${{ matrix.hb-version }}
+  pihole-client-tests:
+    needs: build
+    name: PiholeClient Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.node-version }}
+      - run: npm install
+      - name: Run PiholeClient Tests
+        run: npm run test:jest

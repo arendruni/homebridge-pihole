@@ -20,6 +20,12 @@ coverage
 # nyc test coverage
 .nyc_output
 
+# E2E Test Storage
+e2e/test-storage
+e2e/test-storage-insecure
+persist
+
+
 # Grunt intermediate storage (http://gruntjs.com/creating-plugins#storing-task-files)
 .grunt
 
@@ -61,3 +67,4 @@ typings/
 .next
 
 dist
+e2e/test-storage-jest

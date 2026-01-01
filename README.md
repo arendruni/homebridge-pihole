@@ -35,6 +35,7 @@ There are the following options:
 - `rejectUnauthorized` If the HTTPS agent should check the validity of SSL cert, set it to `false` to allow self-signed certs to work. Default is `true`.
 - `time` How long Pi-hole will be disabled, in seconds, default is 0 that means permanently disabled.
 - `reversed` When set to `true` reverse the status of Pi-hole. When Pi-hole is _off_ the plugin will be set to _on_ and when Pi-hole is _on_ the plugin will be set to _off_. Default is `false`.
+- `persistSession` If the session should be persisted to disk. Default is `false`.
 - `logLevel` Logging level, three different levels: 0: logging disabled, 1: logs only HTTP errors, 2: logs each HTTP response. Default is set to 1.
 
 ### Device Information
@@ -51,3 +52,13 @@ See the [sample-config.json](sample-config.json) file to see an example of how t
 2. Navigate to the _Settings_ page and then to the  _Web interface / API_ tab, and enable the _Expert_ settings.
 3. In the _Advanced Settings_ panel, click on the _Configure app password_ button, a popup window will ask for confirmation, go ahead and copy the app password then click on _Enable new app password_.
 4. Paste your App password in the homebridge-pihole configuration file.
+
+## Common Errors
+
+### api_seats_exceeded
+
+This error occurs when the maximum number of Pi-hole API sessions is reached. By default, the plugin does not persist sessions, so each time Homebridge restarts, a new session is created. To fix this, you can:
+
+1. Enable `persistSession` in the configuration.
+2. Delete old sessions that are not expired (from Pi-hole `/admin/settings/api` page remove session with userAgent `homebridge-pihole`).
+3. Increase the `webserver.api.max_session` Pi-hole setting.
