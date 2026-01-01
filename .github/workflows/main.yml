@@ -2,12 +2,12 @@ name: Main
 on: [push, pull_request]
 jobs:
   test:
-    name: ${{ matrix.test-type }} (Node ${{ matrix.node-version }}${{ matrix.hb-version && ', Homebridge ' }}${{ matrix.hb-version }})
+    name: ${{ matrix.test-type }} (Node ${{ matrix.node-version }}${{ (matrix.test-type == 'Integration' || matrix.test-type == 'e2e') && format(', Homebridge {0}', matrix.hb-version) || '' }})
     strategy:
       fail-fast: false
       matrix:
         node-version: [18.x, 20.x, 22.x, 24.x]
-        test-type: [Jest, Homebridge]
+        test-type: [PiholeClient, Integration, e2e]
         hb-version: [latest, ^2.0.0-beta]
         exclude:
           - test-type: Jest
@@ -20,13 +20,24 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - run: npm install
       - run: npm run build
-      - name: Jest Tests
-        if: matrix.test-type == 'Jest'
+      - name: PiholeClient Tests
+        if: matrix.test-type == 'PiholeClient'
         run: |
           npm test
           npm run test:jest
+      - name: Install Homebridge
+        if: matrix.test-type == 'e2e'
+        run: npm install homebridge@${{ matrix.hb-version }} --no-save
+      - name: Pull Pi-hole Image
+        if: matrix.test-type == 'e2e'
+        run: docker pull pihole/pihole:latest
+      - name: E2E Tests
+        if: matrix.test-type == 'e2e'
+        run: npm run test:e2e
+        env:
+          PIHOLE_IMAGE: pihole/pihole:latest
       - name: Homebridge Integration Tests
-        if: matrix.test-type == 'Homebridge'
+        if: matrix.test-type == 'Integration'
         run: ./test-configuration/test.sh
         shell: bash
         env:
