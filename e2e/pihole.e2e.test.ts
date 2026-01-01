@@ -78,6 +78,39 @@ describe("Pihole Plugin E2E with Docker", () => {
 		});
 	};
 
+	// Helper to get characteristic value with fresh fetch
+	const getCharacteristicValue = async (aid: number, iid: number): Promise<any> => {
+		const { body } = await request(
+			`http://localhost:${HOMEBRIDGE_PORT}/characteristics?id=${aid}.${iid}`,
+			{
+				headers: {
+					"Authorization": "031-45-154",
+				},
+			},
+		);
+		const data = (await body.json()) as any;
+		return data.characteristics[0].value;
+	};
+
+	// Helper to wait for characteristic to reach expected value
+	const waitForCharacteristicValue = async (
+		aid: number,
+		iid: number,
+		expectedValues: any[],
+		maxRetries = 10,
+		delayMs = 500,
+	): Promise<any> => {
+		for (let i = 0; i < maxRetries; i++) {
+			const value = await getCharacteristicValue(aid, iid);
+			if (expectedValues.includes(value)) {
+				return value;
+			}
+			await new Promise((resolve) => setTimeout(resolve, delayMs));
+		}
+		// Return last value even if it doesn't match, let the test assertion handle it
+		return await getCharacteristicValue(aid, iid);
+	};
+
 	beforeAll(async () => {
 		// Clean storage
 		if (fs.existsSync(STORAGE_PATH)) {
@@ -202,8 +235,11 @@ describe("Pihole Plugin E2E with Docker", () => {
 	beforeEach(async () => {
 		// Reset Pi-hole to Blocking Enabled before each test
 		await setPiholeStatus(true);
-		// Wait a bit for Homebridge to poll/sync if needed
-		await new Promise((resolve) => setTimeout(resolve, 1000));
+		// Verify Pi-hole is actually enabled
+		const status = await getPiholeStatus();
+		expect(status.blocking).toBe("enabled");
+		// Give Homebridge a bit of time to potentially sync
+		await new Promise((resolve) => setTimeout(resolve, 500));
 	});
 
 	describe("Normal Mode", () => {
@@ -212,19 +248,10 @@ describe("Pihole Plugin E2E with Docker", () => {
 			const switchService = acc.services.find((s: any) => s.type.includes("49"));
 			const onChar = switchService.characteristics.find((c: any) => c.type.includes("25"));
 			
-			// Force a fresh fetch from Pi-hole by reading the characteristic directly
-			const { body } = await request(
-				`http://localhost:${HOMEBRIDGE_PORT}/characteristics?id=${acc.aid}.${onChar.iid}`,
-				{
-					headers: {
-						"Authorization": "031-45-154",
-					},
-				},
-			);
-			const freshData = (await body.json()) as any;
-			const freshValue = freshData.characteristics[0].value;
+			// Poll until characteristic reflects the enabled state (or timeout)
+			const value = await waitForCharacteristicValue(acc.aid, onChar.iid, [true, 1]);
 			
-			expect([true, 1]).toContain(freshValue);
+			expect([true, 1]).toContain(value);
 		});
 
 		it("should disable Pi-hole when turned OFF", async () => {
@@ -247,19 +274,10 @@ describe("Pihole Plugin E2E with Docker", () => {
 			const switchService = acc.services.find((s: any) => s.type.includes("49"));
 			const onChar = switchService.characteristics.find((c: any) => c.type.includes("25"));
 			
-			// Force a fresh fetch from Pi-hole by reading the characteristic directly
-			const { body } = await request(
-				`http://localhost:${HOMEBRIDGE_PORT}/characteristics?id=${acc.aid}.${onChar.iid}`,
-				{
-					headers: {
-						"Authorization": "031-45-154",
-					},
-				},
-			);
-			const freshData = (await body.json()) as any;
-			const freshValue = freshData.characteristics[0].value;
+			// Poll until characteristic reflects the enabled state (or timeout)
+			const value = await waitForCharacteristicValue(acc.aid, onChar.iid, [false, 0]);
 			
-			expect([false, 0]).toContain(freshValue);
+			expect([false, 0]).toContain(value);
 		});
 
 		it("should disable Pi-hole when turned ON", async () => {
