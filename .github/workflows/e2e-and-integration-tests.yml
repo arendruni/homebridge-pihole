@@ -1,0 +1,44 @@
+name: E2E and Integration Tests Workflow
+
+on:
+  workflow_call:
+    inputs:
+      node-version:
+        required: true
+        type: string
+      hb-version:
+        required: true
+        type: string
+
+jobs:
+  integration-test:
+    name: Test integration (Node ${{ inputs.node-version }}, Homebridge ${{ inputs.hb-version }})
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.node-version }}
+      - run: npm install
+      - name: test script homebridge
+        run: ./test-configuration/test.sh
+        shell: bash
+        env:
+          HOMEBRIDGE_VERSION: ${{ matrix.homebridge-version }}
+  e2e-tests:
+    name: Test e2e (Node ${{ inputs.node-version }}, Homebridge ${{ inputs.hb-version }})
+    runs-on: ubuntu-latest
+    env:
+      PIHOLE_IMAGE: pihole/pihole:latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.node-version }}
+      - run: npm install
+      - name: Install Homebridge
+        run: npm install homebridge@${{ inputs.hb-version }} --no-save
+      - name: Pull Pi-hole Image
+        run: docker pull ${{ env.PIHOLE_IMAGE }}
+      - name: E2E Tests
+        run: npm run test:e2e
